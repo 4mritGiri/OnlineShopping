@@ -93,15 +93,17 @@ class User(AbstractUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
-    def save(self, *args, **kwargs):
-        try:
-            this = User.objects.get(id=self.id)
-            if this.avatar != self.avatar:
-                this.avatar.delete(save=False)
-        except User.DoesNotExist:
-            pass
-        super(User, self).save(*args, **kwargs)
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                existing_user = User.objects.get(pk=self.pk)
+                if existing_user.avatar != self.avatar and existing_user.avatar:
+                    existing_user.avatar.delete(save=False)
+            except User.DoesNotExist:
+                pass
+        
+        super(User, self).save(*args, **kwargs)
     class Meta:
         verbose_name_plural = "Users"
 
