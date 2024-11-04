@@ -203,8 +203,8 @@ class CheckoutForm(forms.Form):
         data = self.cleaned_data['postcode']
         if not data.isdigit():
             raise ValidationError(_('Postal Code must be only numbers.'))
-        elif len(data) != 10:
-            raise ValidationError(_('Postal Code must be 10 digits.'))
+        elif len(data) != 5:
+            raise ValidationError(_('Postal Code must be 5 digits.'))
         return data
 
 
