@@ -1,34 +1,39 @@
-from django.shortcuts import render , redirect , get_object_or_404
-from django.views.generic.edit import UpdateView 
-from django.views.generic import DetailView , ListView 
 from .models import *
-from .forms import ProfileForm , PriceFilter , CheckoutForm 
-from django.http import  HttpResponse , HttpResponseRedirect
-from django.utils.translation import gettext_lazy as _
+from .forms import ProfileForm, PriceFilter, CheckoutForm 
+from .tokens import generateToken
+
+from config import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required 
 from django.contrib import messages
-from django.urls import  reverse_lazy , reverse
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail, EmailMessage
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count
 from django.db.models import Q
-from django.core.paginator import Paginator ,EmptyPage, PageNotAnInteger
-
-from django.contrib.auth import get_user_model
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+from django.urls import reverse_lazy, reverse
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_str
+from django.views.generic import DetailView, ListView, UpdateView
 
 from functools import reduce
+import logging
 import operator
 
-from config import settings
-from django.core.mail import send_mail, EmailMessage
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_str
-from . tokens import generateToken
+
+
+
+
+
+logger = logging.getLogger(__name__)
 
 
 SHIPPING_COST = 100
@@ -144,27 +149,34 @@ def activate(request, uidb64, token):
 
 
 
-class Profile(LoginRequiredMixin , UpdateView):
-    import json
+class Profile(LoginRequiredMixin, UpdateView):
     model = User
     template_name = 'account-profile.html'
     form_class = ProfileForm
     success_url = reverse_lazy('profile')
-    
+
     def get_context_data(self, **kwargs):
         context = super(Profile, self).get_context_data(**kwargs)
         context.update({
             'breadcrumb': [
-                {'title':'Home','url': reverse('index')},
-                {'title':'Account','url': reverse('profile')},
-                {'title':'Edit Profile'}
+                {'title': 'Home', 'url': reverse('index')},
+                {'title': 'Account', 'url': reverse('profile')},
+                {'title': 'Edit Profile'}
             ],
             'title': f'{self.request.user.username} Profile',
         })
         return context
-    
+
     def get_object(self):
-        return User.objects.get(pk=self.request.user.pk)
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.success(self.request, "Profile updated successfully!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "There was an error updating your profile. Please correct the errors below.")
+        return super().form_invalid(form)
 
 
 

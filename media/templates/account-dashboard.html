@@ -23,7 +23,7 @@
 											{% if user.avatar %}
 												<img src="{{ user.avatar.url }}" height="100" width="100" class="rounded-circle" style="object-fit: cover;" alt="">
 											{% else %}
-												<img src="{% static 'images/avatar.png' %}" height="100" width="100" class="rounded-circle" style="object-fit: cover;" alt="">
+												<img src="{% static 'images/avatars/avatar-1.jpg' %}" height="100" width="100" class="rounded-circle" style="object-fit: cover;" alt="">
 											{% endif %}
 										</div>
 										<div class="profile-card__name">{% if user.first_name %} {{user.first_name}} {{user.last_name}} {% else %} {{user.username}} {% endif %}</div>
