@@ -65,7 +65,7 @@ def register(request):
         
         # send email when account has been created successfully
         subject = "Welcome to online shopping"
-        message = "Welcome "+ my_user.email + "\n thank for chosing out online shopping.\n To order login you need to comfirm your email account.\n thanks\n\n\n Nep X. Infotech"
+        message = "Welcome "+ my_user.email + "\n thank for chosing out online shopping.\n To order login you need to comfirm your email account.\n thanks\n\n\n Nishita"
         
         from_email = settings.EMAIL_HOST_USER
         to_list = [my_user.email]
@@ -194,7 +194,7 @@ class ProductListView(ListView):
                 seller_id = request.POST.get('Seller')
                 size_id = request.POST.get('Size')
                 material_id  = request.POST.get('Material')
-                UsersProducts = Cart.objects.filter(user=request.user, payed = 'F')
+                UsersProducts = Cart.objects.filter(user=request.user, payed='F')
                 Found = False
                 for i in UsersProducts:
                     if i.seller == ProductInstance.objects.get(id=seller_id) and \
@@ -215,7 +215,9 @@ class ProductListView(ListView):
                         material = Materials.objects.get(id=material_id),
                         seller=ProductInstance.objects.get(id=seller_id)
                     )
-                return redirect(request.META['HTTP_REFERER'])
+                    addCart.save()
+                    messages.success(request, "Product added to cart")
+                    return redirect(request.META['HTTP_REFERER'])
 
             elif 'addWishlist' in request.POST:
                 product_id = request.POST['product']
@@ -227,6 +229,7 @@ class ProductListView(ListView):
                     )
                     if product :
                         product.delete()
+                        messages.success(request, "Product removed from wishlist")
                         return redirect(request.META['HTTP_REFERER'])
                     else:
                         w = WishList.objects.create(
@@ -234,21 +237,23 @@ class ProductListView(ListView):
                             product = Product.objects.get(id=product_id)
                         )
                         w.save()
+                        messages.success(request, "Product added to wishlist")
                         return redirect(request.META['HTTP_REFERER'])
                 else:
+                    messages.warning(request, "Product not found")
                     return redirect(request.META['HTTP_REFERER'])
-            
 
             elif 'addCompare' in request.POST:
                 product_id = request.POST['product']
-                product_check = Product.objects.get(id = product_id)
+                product_check = Product.objects.get(id=product_id)
                 if product_check:
                     product= Compare.objects.filter(
                         user=request.user , 
-                        product=Product.objects.get(id = product_id)
+                        product=Product.objects.get(id=product_id)
                     )
-                    if product :
+                    if product:
                         product.delete()
+                        messages.success(request, "Product removed from compare")
                         return redirect(request.META['HTTP_REFERER'])
                     else:
                         w = Compare.objects.create(
@@ -256,19 +261,33 @@ class ProductListView(ListView):
                             product_id=product_id
                         )
                         w.save()
+                        messages.success(request, "Product added to compare")
                         return redirect(request.META['HTTP_REFERER'])
                 else:
+                    messages.warning(request, "Product not found")
                     return redirect(request.META['HTTP_REFERER'])
+        else:
+            messages.warning(request, "Please login to add to cart, wishlist or compare")
+            return redirect('login')
 
     def get_context_data(self, **kwargs):
         context = super(ProductListView, self).get_context_data(**kwargs)
         mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')
+        for i in mostSold:
+            i.product.rating = random.randint(1, 5)
+            i.product.reviews = random.randint(5, 100)
+            
         instock = ProductInstance.objects.filter(~Q(instock=0)).values() 
 
         # Show the top 9 categories most products
         topCategories = ProductCategory.objects.annotate(num_products=Count('products')).order_by('-num_products')[:9]
+        products = Product.objects.all()
+        for product in products:
+            product.rating = random.randint(1, 5)
+            product.reviews = random.randint(5, 100)
+        
         context.update({
-            'products': Product.objects.all(),
+            'products': products,
             'mostSold' : mostSold,
             'instock' : instock,
             'Brands': Brand.objects.all(),
@@ -281,12 +300,12 @@ class ProductListView(ListView):
 
 
 def ProductDetailView(request, productslug):
-    k = get_object_or_404(Product, slug = productslug)
-    aProduct = Product.objects.filter(category = k.category)
-    comments = Comments.objects.filter(product__id = k.id)
+    k = get_object_or_404(Product, slug=productslug)
+    aProduct = Product.objects.filter(category=k.category)
+    comments = Comments.objects.filter(product__id=k.id)
 
     inst = []
-    i = ProductInstance.objects.filter(product = k)
+    i = ProductInstance.objects.filter(product=k)
     for a in i:
         if a.instock != 0:
             inst.append(a)
@@ -300,8 +319,10 @@ def ProductDetailView(request, productslug):
         if request.user.is_authenticated:
                 if 'addComment' in request.POST:
                     text = request.POST['text']
-                    c = Comments.objects.create(writer = request.user, body = text, product = k)
+                    c = Comments.objects.create(writer=request.user, body=text, product=k)
                     c.save()
+                    messages.success(request, "Comment added successfully")
+                    return redirect(request.META['HTTP_REFERER'])
 
                 elif 'addCart' in request.POST:
                     try:
@@ -309,7 +330,7 @@ def ProductDetailView(request, productslug):
                         seller_id = request.POST.get('Seller')
                         size_id = request.POST.get('Size')
                         material_id  = request.POST.get('Material')
-                        UsersProducts = Cart.objects.filter(user = request.user, payed = 'F')
+                        UsersProducts = Cart.objects.filter(user=request.user, payed='F')
                         Found = False
                         for i in UsersProducts:
                             if i.seller == ProductInstance.objects.get(id=seller_id) and \
@@ -330,6 +351,7 @@ def ProductDetailView(request, productslug):
                                 material = Materials.objects.get(id=material_id),
                                 seller= ProductInstance.objects.get(id=seller_id)
                             )
+                            addCart.save()
                             messages.success(request, "Product added to cart")
                             return redirect(request.META['HTTP_REFERER'])
                     except ObjectDoesNotExist:
@@ -338,14 +360,15 @@ def ProductDetailView(request, productslug):
                 
                 elif 'addWishlist' in request.POST:
                     product_id = request.POST['product']
-                    product_check = Product.objects.get(id = product_id)
+                    product_check = Product.objects.get(id=product_id)
                     if product_check:
-                        product= WishList.objects.filter(user=request.user , product_id = product_id )
+                        product= WishList.objects.filter(user=request.user, product_id=product_id )
                         if product :
                             product.delete()
+                            messages.success(request, "Product removed from wishlist")
                             return redirect(request.META['HTTP_REFERER'])
                         else:
-                            w = WishList.objects.create(user = request.user , product_id = product_id)
+                            w = WishList.objects.create(user=request.user , product_id=product_id)
                             w.save()
                             messages.success(request, "Product added to wishlist")
                             return redirect(request.META['HTTP_REFERER'])
@@ -355,21 +378,24 @@ def ProductDetailView(request, productslug):
 
                 elif 'addCompare' in request.POST:
                     product_id = request.POST['product']
-                    product_check = Product.objects.get(id = product_id)
+                    product_check = Product.objects.get(id=product_id)
                     if product_check:
-                        product= Compare.objects.filter(user=request.user , product_id = product_id )
+                        product = Compare.objects.filter(user=request.user, product_id=product_id )
                         if product :
                             product.delete()
+                            messages.success(request, "Product removed from compare")
                             return redirect(request.META['HTTP_REFERER'])
                         else:
-                            w = Compare.objects.create(user = request.user , product_id = product_id)
+                            w = Compare.objects.create(user=request.user, product_id=product_id)
                             w.save()
                             messages.success(request, "Product added to compare")
                             return redirect(request.META['HTTP_REFERER'])
                     else:
                         messages.warning(request, "Product not found")
                         return redirect(request.META['HTTP_REFERER'])
-            
+        else:
+            messages.warning(request, "Please login to add to cart, wishlist or compare")
+            return redirect('login')
 
     if inst:
         context = {
@@ -414,7 +440,7 @@ def CategoryOrInstockSluger(catslug):
 def JustInstock(products):
     lstProducts = []
     for i in products:
-        if i.productinst.filter(~Q(instock = 0)):
+        if i.productinst.filter(~Q(instock=0)):
             lstProducts.append(i)
     return lstProducts
 
@@ -423,9 +449,9 @@ def JustInstock(products):
 def MaxMinPrice(products, minPrice, maxPrice):
     lstProducts = []
     for i in products:
-        if i.productinst.filter(~Q(instock = 0)):
-            if i.productinst.filter(price__lte = maxPrice):
-                if len(i.productinst.filter(price__gt = minPrice)):
+        if i.productinst.filter(~Q(instock=0)):
+            if i.productinst.filter(price__lte=maxPrice):
+                if len(i.productinst.filter(price__gt=minPrice)):
                     lstProducts.append(i)
     return lstProducts
 
@@ -452,7 +478,7 @@ class CategoryListView(ListView):
         lst = CategoryOrInstockSluger(catslug)
         form = PriceFilter()
         color = Color.objects.all()
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')
         context.update({
             'title': f'{lst[1].name} - {lst[0].count()} Products',
             'products' : lst[0],
@@ -491,7 +517,7 @@ class CategoryListViewInstock(CategoryListView):
         lst = CategoryOrInstockSluger(catslug)
         form = PriceFilter()
         products = JustInstock(lst[0])
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')[:5]
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')[:5]
         context.update({
             'title': f'{lst[1].name} - {lst[1].name}',
             'products' : products,
@@ -522,7 +548,7 @@ class CategoryPriceFilterListView(ListView):
             maxPrice = form.cleaned_data['maxPrice']
             return HttpResponseRedirect(reverse('CategoryPriceFilter', kwargs={'catslug' : self.kwargs['catslug'],'minPrice' : minPrice, 'maxPrice' : maxPrice}))
         return HttpResponseRedirect(reverse('CategoryListViewInstock', kwargs={'catslug' : self.kwargs['catslug']}))
-  
+    
     def get_context_data(self, **kwargs):
         context = super(CategoryPriceFilterListView, self).get_context_data(**kwargs)
         minPrice = int(self.kwargs['minPrice'])
@@ -530,7 +556,7 @@ class CategoryPriceFilterListView(ListView):
         lst = CategoryOrInstockSluger(self.kwargs['catslug'])
         products = MaxMinPrice(lst[0], minPrice, maxPrice)
         form = PriceFilter()
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')[:5]
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')[:5]
         context.update({
             'title': f'{lst[1].name} - {products.count()} Products',
             'products' : products,
@@ -599,9 +625,9 @@ class BrandListViewInstock(ListView):
         
     def get_context_data(self, **kwargs):
         context = super(BrandListViewInstock, self).get_context_data(**kwargs)
-        maker = get_object_or_404(Brand, slug = self.kwargs["brandslug"])
+        maker = get_object_or_404(Brand, slug=self.kwargs["brandslug"])
         products = JustInstock(maker.manufactor.all())
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')[:5]
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')[:5]
         context.update({
             'title': f'{maker.name} - {maker.name}',
             'products' : products,
@@ -627,12 +653,12 @@ class BrandPriceFilter(ListView):
             minPrice = form.cleaned_data['minPrice']
             maxPrice = form.cleaned_data['maxPrice']
             return HttpResponseRedirect(reverse('BrandPriceFilter', kwargs={'brandslug' : self.kwargs['brandslug'],'minPrice' : minPrice, 'maxPrice' : maxPrice}))
-     
+    
     def get_context_data(self, **kwargs):
         context = super(BrandPriceFilter, self).get_context_data(**kwargs)
-        maker = get_object_or_404(Brand, slug = self.kwargs["brandslug"])
+        maker = get_object_or_404(Brand, slug=self.kwargs["brandslug"])
         products = MaxMinPrice(maker.manufactor.all(), self.kwargs['minPrice'], self.kwargs['maxPrice'])
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')[:5]
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')[:5]
         context.update({
             'title': f'{maker.name} - {maker.name}',
             'products' : products,
@@ -672,16 +698,15 @@ class BrandCategory(ListView):
         context = super(BrandCategory, self).get_context_data(**kwargs)
         brand = self.kwargs['brandslug']
         catslug = self.kwargs['catslug']
-        manu = get_object_or_404(Brand, slug = brand)
+        manu = get_object_or_404(Brand, slug=brand)
         lst = BrandCategorySluger(catslug, manu)
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')[:5]
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')[:5]
         context.update({
             'title': f'{manu.name} - {lst[0].count()} Products',
             'products' : lst[0],
             'cate' : lst[1],
             'mostSold' : mostSold,
             'brand': manu,
-            # 'brands' : Brand.objects.all(),
             'is_authenticated' : self.request.user.is_authenticated,
             'form' : PriceFilter(),
         })
@@ -709,7 +734,7 @@ class BrandCategoryInstock(ListView):
         manu = get_object_or_404(Brand, slug = brand)
         lst = BrandCategorySluger(catslug, manu)
         products = JustInstock(lst[0])
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')
         context.update({
             'title': f'{manu.name} - {lst[1].count()} Products',
             'products' : products,
@@ -743,10 +768,10 @@ class BrandCategoryPriceFilter(ListView):
         catslug = self.kwargs['catslug']
         maxPrice = self.kwargs['maxPrice']
         minPrice = self.kwargs['minPrice']
-        manu = get_object_or_404(Brand, slug = brand)
+        manu = get_object_or_404(Brand, slug=brand)
         lst = BrandCategorySluger(catslug, manu)
         products = MaxMinPrice(lst[0], minPrice, maxPrice)
-        mostSold = Cart.objects.annotate(num_products = Count('seller')).order_by('-num_products')[:5]
+        mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')[:5]
         context.update({
             'title': f'{manu.name} - {lst[1].count()} Products',
             'products' : products,
@@ -792,6 +817,7 @@ def cart_(request):
                             break
                 except Product.DoesNotExist:
                     # Handle error (e.g., return an error message)
+                    logger.error(f"Product with slug {slug} does not exist")
                     pass
 
             elif 'delete' in request.POST:
@@ -804,7 +830,9 @@ def cart_(request):
                             break
                 except Product.DoesNotExist:
                     # Handle error (e.g., return an error message)
+                    logger.error(f"Product with slug {slug} does not exist")
                     pass
+                messages.success(request, "Product removed from cart")
                 return redirect(request.META['HTTP_REFERER'])
 
             elif 'applyCoupon' in request.POST:
@@ -820,6 +848,7 @@ def cart_(request):
                         for obj in objs:
                             obj.coupon = co
                             obj.save()
+                        messages.success(request, "Coupon applied successfully")
                         return HttpResponseRedirect(reverse('cart'))
                 except Coupon.DoesNotExist:
                     error = 'The coupon code is incorrect!'
@@ -878,6 +907,7 @@ def contact_us(request):
         description = request.POST['description']
         call = ContactUs.objects.create(name = name, email = email, desc = description)
         call.save()
+        messages.success(request, "Message sent successfully")
         context = {
             'title': 'Contact Us',
             'sent' : True,
@@ -937,8 +967,9 @@ def checkout(request):
             messages.success(request, "Order placed successfully")
             return redirect('cart')
         else:
-            print("Form is not valid")  # Debugging line
-            print(form.errors)  # Debugging line to show form errors
+            logger.error(f"Form is not valid: {form.errors}")
+            messages.error(request, "Form is not valid")
+            return redirect(request.META['HTTP_REFERER'])
         
     else:
         form = CheckoutForm(initial={'address': usr.address, 'city': usr.city, 'state': usr.state, 'postcode': usr.postcode})
@@ -1121,10 +1152,12 @@ def compare(request):
             product_obj = Product.objects.get(slug=slug)
             for obj in compare:
                 if obj.product == product_obj:
-                    print('-----   Found : True   -----')
                     obj.delete()
-                    break
-        return redirect(request.META['HTTP_REFERER'])
+                    messages.success(request, "Product removed from compare")
+                    return redirect('compare')
+        else:
+            messages.warning(request, "Please login to add to cart, wishlist or compare")
+            return redirect('login')
 
 
     context = {
@@ -1255,8 +1288,8 @@ def track_order(request):
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
         username = request.POST.get('username')
-        user = User.objects.get(username=username)
         try:
+            user = User.objects.get(username=username)
             order = Sold.objects.get(id=order_id, user=user)
             context = {
                 'title': 'Track Order',
@@ -1302,14 +1335,13 @@ def wishlist(request):
                 product_obj = Product.objects.get(slug=slug)
                 for obj in wishlist:
                     if obj.product == product_obj:
-                        print('-----   Found : True   -----')
                         obj.delete()
-                        break
+                        messages.success(request, "Product removed from wishlist")
+                        return redirect('wishlist')
             except Product.DoesNotExist:
                 messages.error(request, "Product not found. It may have been removed from the wishlist.")
         
         elif 'addCart' in request.POST:
-            print('-----   addCart : True   -----')
             slug = request.POST.get('product_slug')
             try:
                 product_obj = Product.objects.get(slug=slug)

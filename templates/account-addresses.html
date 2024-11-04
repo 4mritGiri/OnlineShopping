@@ -4,6 +4,7 @@
 {% block title%}{{ block.super }} Addresses {% endblock %}
 
 
+
 {% block body %}
 		<!-- site__body -->
 		<div class="site__body">
@@ -20,27 +21,24 @@
 								<div class="addresses-list__plus"></div>
 								<div class="btn btn-secondary btn-sm">Add New</div>
 								</a>
-								
 									<div class="addresses-list__divider"></div>
-									
 									<div class="addresses-list__item card address-card">
 										<div class="address-card__badge">Default</div>
 										<div class="address-card__body">
-										
 										<div class="address-card__name">{{user.first_name}} {{user.last_name}}</div>
 										<div class="address-card__row">{{user.address}}</div>
 										<div class="address-card__row">
 										<div class="address-card__row-title">Phone Number</div>
 										<div class="address-card__row-content"><span class="ltr_text">{{user.phone}}</span></div>
-										
 									</div>
 									<div class="address-card__row">
 									<div class="address-card__row-title">Email</div>
 									<div class="address-card__row-content">{{user.email}}</div>
-										
 									</div>
-								
-									<div class="address-card__footer"><a href="#">Edit</a>&nbsp;&nbsp; <a href="#">Delete</a></div>
+									<div class="address-card__footer">
+										<a href="{% url 'addresses' %}">Edit</a>&nbsp;&nbsp; 
+										<a href="#">Delete</a>
+									</div>
 									</div>
 								</div>
 							</div>
