@@ -11,6 +11,7 @@ from time import gmtime, strftime
 import os
 
 
+
 def get_upload_path(instance, filename, folder_name):
     return os.path.join(f'static/images/{folder_name}/', strftime("%Y%m%d-%H%M%S", gmtime()) + filename)
 
@@ -33,6 +34,7 @@ def get_carousel_banner_upload_path(instance, filename):
     return get_upload_path(instance, filename, 'carousel_banners')
 
 
+
 class States(models.Model):
     name = models.CharField(max_length=50)
 
@@ -41,6 +43,7 @@ class States(models.Model):
 
     def __str__(self):
         return self.name
+
 
 
 class User(AbstractUser):
@@ -106,6 +109,7 @@ class User(AbstractUser):
         return self.email
 
 
+
 class ProductCategory(models.Model):
     slug = models.SlugField(allow_unicode=True)
     name = models.CharField(max_length=100)
@@ -122,6 +126,7 @@ class ProductCategory(models.Model):
 
     def __str__(self):
         return self.name
+
 
 
 class Brand(models.Model):
@@ -152,6 +157,7 @@ class Brand(models.Model):
         return self.name
 
 
+
 class ProductSize(models.Model):
     sizeno = models.CharField(max_length=20, help_text='Enter a product size')
 
@@ -160,6 +166,7 @@ class ProductSize(models.Model):
 
     def __str__(self):
         return self.sizeno
+
 
 
 class Color(models.Model):
@@ -173,6 +180,7 @@ class Color(models.Model):
         return self.name
 
 
+
 class Materials(models.Model):
     name = models.CharField(max_length=20, help_text="Enter a Product Material")
 
@@ -181,6 +189,7 @@ class Materials(models.Model):
 
     def __str__(self):
         return self.name
+
 
 
 class Product(models.Model):
@@ -241,6 +250,7 @@ class Product(models.Model):
         return self.name
 
 
+
 class ProductInstance(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='instances')
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
@@ -258,6 +268,7 @@ class ProductInstance(models.Model):
         return self.price - self.off if self.off else self.price
 
 
+
 class WishList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -268,6 +279,7 @@ class WishList(models.Model):
 
     def __str__(self):
         return f"{self.user} : {self.product}"
+
 
 
 class Compare(models.Model):
@@ -282,6 +294,7 @@ class Compare(models.Model):
         return f"{self.user} : {self.product}"
 
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=100, help_text="Enter a tag name")
 
@@ -290,6 +303,8 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
 
 class Post(models.Model):
     title = models.CharField(max_length=100, help_text="Enter title for Post")
@@ -328,6 +343,7 @@ class Post(models.Model):
         return self.title
 
 
+
 class Comments(models.Model):
     class StatusChoice(models.TextChoices):
         OK = 'T', "It's Ok"
@@ -342,6 +358,11 @@ class Comments(models.Model):
 
     class Meta:
         verbose_name_plural = "Comments"
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.writer} : {self.body}"
+
 
 
 class Coupon(models.Model):
@@ -393,6 +414,8 @@ class Cart(models.Model):
 
 def get_sold_followup_code():
     return f'{random.randint(10, 99)}{strftime("%Y%m%d%H%M%S", gmtime())}'
+
+
 
 class Sold(models.Model):
     SEND_CHOICES = {

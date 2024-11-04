@@ -15,6 +15,12 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.db.models import Count
 from django.db.models import Q
+from django.core.paginator import Paginator ,EmptyPage, PageNotAnInteger
+
+from django.contrib.auth import get_user_model
+
+from functools import reduce
+import operator
 
 from config import settings
 from django.core.mail import send_mail, EmailMessage
@@ -161,6 +167,7 @@ class Profile(LoginRequiredMixin , UpdateView):
         return User.objects.get(pk=self.request.user.pk)
 
 
+
 class ProductListView(ListView):
     model = Product
     context_object_name = 'products'
@@ -258,6 +265,7 @@ class ProductListView(ListView):
             'topCategories' : topCategories,
         })
         return context
+
 
 
 def ProductDetailView(request, productslug):
@@ -562,6 +570,8 @@ class BrandListView(ListView):
         })
         return context
 
+
+
 class BrandListViewInstock(ListView):
     model = Product
     context_object_name = 'products'
@@ -590,6 +600,8 @@ class BrandListViewInstock(ListView):
             'form' : PriceFilter(),
         })
         return context
+
+
 
 class BrandPriceFilter(ListView):
     model = Product
@@ -621,12 +633,15 @@ class BrandPriceFilter(ListView):
         return context
 
 
+
 def BrandCategorySluger(catslug, manu):
     productsCat = get_object_or_404(ProductCategory, slug = catslug)
     products = manu.products.filter(category = productsCat)
     cate = productsCat
 
     return products, cate
+
+
 
 class BrandCategory(ListView):
     model = Product
@@ -660,6 +675,8 @@ class BrandCategory(ListView):
         })
         return context
 
+
+
 class BrandCategoryInstock(ListView):
     model = Product
     context_object_name = 'products'
@@ -692,6 +709,8 @@ class BrandCategoryInstock(ListView):
             'form' : PriceFilter(),
         })
         return context
+
+
 
 class BrandCategoryPriceFilter(ListView):
     model = Product
@@ -728,57 +747,59 @@ class BrandCategoryPriceFilter(ListView):
         })
         return context
 
+
+
 def is_authenticated(user):
     return not user.is_authenticated
 
 
 
-@login_required(login_url="login" , )
+@login_required(login_url="login")
 def cart_(request):
-    objs = Cart.objects.filter(user=request.user ,payed = 'F')
-    tPrice = 0
-    for i in objs:
-        tPrice += i.total()
-    final = 0
-    for i in objs:
-        final += i.total_price()
-    CFinal = 0
-    for i in objs:
-        CFinal += i.final_price()
-    
-    tax = final - tPrice  
-    coupon = CFinal - final  
+    objs = Cart.objects.filter(user=request.user, payed='F')
+    tPrice = sum(obj.total() for obj in objs)
+    final = sum(obj.total_price() for obj in objs)
+    CFinal = sum(obj.final_price() for obj in objs)
+
+    tax = final - tPrice
+    coupon = CFinal - final
     sendCost = SHIPPING_COST * len(objs)
     toPay = CFinal + tax + sendCost
-    print(toPay)
 
     if objs:
         if request.method == 'POST':
             if 'update' in request.POST:
                 slug = request.POST.get('product_slug')
                 count = request.POST.get('quantity')
-                product_obj = Product.objects.get(slug = slug)
-                for obj in objs:
-                    if obj.product == product_obj:
-                        obj.count = int(count)
-                        obj.save()
-                        break
-            if 'delete' in request.POST:
+                try:
+                    product_obj = Product.objects.get(slug=slug)
+                    for obj in objs:
+                        if obj.product == product_obj:
+                            obj.count = int(count)
+                            obj.save()
+                            break
+                except Product.DoesNotExist:
+                    # Handle error (e.g., return an error message)
+                    pass
+
+            elif 'delete' in request.POST:
                 slug = request.POST.get('product_slug')
-                count = request.POST.get('quantity')
-                product_obj = Product.objects.get(slug = slug)
-                for obj in objs:
-                    if obj.product == product_obj:
-                        print('-----   Found : True   -----')
-                        obj.delete()
-                        break
+                try:
+                    product_obj = Product.objects.get(slug=slug)
+                    for obj in objs:
+                        if obj.product == product_obj:
+                            obj.delete()
+                            break
+                except Product.DoesNotExist:
+                    # Handle error (e.g., return an error message)
+                    pass
                 return redirect(request.META['HTTP_REFERER'])
 
-            if 'applyCoupon' in request.POST:
+            elif 'applyCoupon' in request.POST:
                 code = request.POST.get('couponCode')
                 error = None
                 try:
-                    co = Coupon.objects.get(code = code)
+                    co = Coupon.objects.get(code=code)
                     if co.is_expired():
                         error = 'The expiration date for this coupon has expired!'
                     elif not co.count > 0:
@@ -790,49 +811,51 @@ def cart_(request):
                         return HttpResponseRedirect(reverse('cart'))
                 except Coupon.DoesNotExist:
                     error = 'The coupon code is incorrect!'
-                
-                if error != None:
-                    context = {
-                        'title': f'Shopping Cart',
-                        'carts' : objs,
-                        'is_authenticated' : True,
-                        'error' : error,
-                        'breadcrumb':[
-                            {'title':'Home','url': reverse('index')},
-                            {'title': "Shopping Cart", 'url': reverse('cart')},
-                            {'title':'Shopping Cart'}
-                        ]
-                    }
+
+                # If there's an error, prepare context
+                context = {
+                    'title': 'Shopping Cart',
+                    'carts': objs,
+                    'is_authenticated': True,
+                    'error': error,
+                    'breadcrumb': [
+                        {'title': 'Home', 'url': reverse('index')},
+                        {'title': "Shopping Cart", 'url': reverse('cart')},
+                        {'title': 'Shopping Cart'}
+                    ]
+                }
                 return render(request, 'cart.html', context)
-            
-        
+
+        # Render cart context
         context = {
             'title': f'Cart({objs.count()})',
-            'carts' : objs,
-            'is_authenticated' : True,
+            'carts': objs,
+            'is_authenticated': True,
             'totalPrice': tPrice,
-            'finalPrice' : final,
-            'tax' : tax,
+            'finalPrice': final,
+            'tax': tax,
             'coupon': coupon,
-            'sendCost' : sendCost,
+            'sendCost': sendCost,
             'toPay': toPay,
-            'breadcrumb':[
-                {'title':'Home','url': reverse('index')},
+            'breadcrumb': [
+                {'title': 'Home', 'url': reverse('index')},
                 {'title': "Shopping Cart", 'url': reverse('cart')},
-                {'title':'Cart'}
+                {'title': 'Cart'}
             ]
         }
         return render(request, 'cart.html', context)
-    else:
-        context = {
-            'title': f'Empty Cart',
-            'breadcrumb':[
-                {'title':'Home','url': reverse('index')},
-                {'title': "Shopping Cart", 'url': reverse('cart')},
-                {'title':'Empty Cart'}
-            ]
-        }
-        return render(request, 'cart-empty.html', context)
+    
+    # Empty cart response
+    context = {
+        'title': 'Empty Cart',
+        'breadcrumb': [
+            {'title': 'Home', 'url': reverse('index')},
+            {'title': "Shopping Cart", 'url': reverse('cart')},
+            {'title': 'Empty Cart'}
+        ]
+    }
+    return render(request, 'cart-empty.html', context)
+
 
 
 def contact_us(request):
@@ -849,8 +872,6 @@ def contact_us(request):
         }
     return render(request, 'contact-us.html', context)
 
-
-from django.contrib.auth import get_user_model
 
 
 @login_required(login_url="login")
@@ -964,6 +985,7 @@ class PostListView(ListView):
         return context
 
 
+
 class LatestPostsMixin(object):
 
     def get_context_data(self, **kwargs):
@@ -973,6 +995,7 @@ class LatestPostsMixin(object):
         except:
             pass
         return context
+
 
 
 class PostDetailView(LatestPostsMixin,DetailView):
@@ -1006,7 +1029,7 @@ class PostDetailView(LatestPostsMixin,DetailView):
             ]
         })
         return context
-    
+
 
 
 class Address(LoginRequiredMixin,DetailView):
@@ -1028,57 +1051,6 @@ class Address(LoginRequiredMixin,DetailView):
         return User.objects.get(pk=self.request.user.pk )
 
 
-
-"""from django.core.paginator import Paginator
-from django.core.paginator import EmptyPage
-from django.core.paginator import PageNotAnInteger
-
-def search_post(request , search=None):
-    if request.method =='POST':
-        user_search = request.POST.get('search')
-        
-        if user_search:
-            post_results1 = Post.objects.filter(body__icontains= user_search)
-            post_results2 = Post.objects.filter(title__icontains= user_search)
-            posts = post_results1 | post_results2
-
-            if search:
-                posts.filter(slug__in= search)
-            
-            paginator = Paginator(posts , 6)
-            page = request.GET.get('page')
-
-            try:
-                posts = paginator.page(page)
-            except PageNotAnInteger:
-                posts = paginator.page(1)
-            except EmptyPage:
-                posts = paginator.page(paginator.num_pages)
-            
-            return render(request , 'blog-classic.html' , {'posts':posts , 'page':page })
-    
-    post_results = Post.objects.all()
-    posts = post_results
-    if search:
-        posts.filter(slug__in= search)
-        
-    paginator = Paginator(posts , 6)
-    page = request.GET.get('page')
-
-    try:
-        posts = paginator.page(page)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
-    return render(request , 'blog-classic.html' , {'posts':posts , 'page':page })
-"""
-
-
-
-
-from functools import reduce
-import operator
 
 class SearchProduct(ProductListView):
     """
@@ -1118,6 +1090,7 @@ class SearchProduct(ProductListView):
     
     def and_(a, b):
         return a and b
+
 
 
 @login_required(login_url='login')
@@ -1161,11 +1134,15 @@ def error_404(request , *args ,**kwargs):
     }
     return render(request ,'404.html' , context)
 
+
+
 def error_500(request , *args ,**kwargs):
     context = {
         'title': '500',
     }
     return render(request ,'500.html' , context)
+
+
 
 def about_us(request):
     context = {
@@ -1174,7 +1151,7 @@ def about_us(request):
     return render(request ,'about-us.html' , context)
 
 
-from django.core.paginator import Paginator ,EmptyPage, PageNotAnInteger
+
 @login_required(login_url="login")
 def account_orders(request):
     cart = Cart.objects.filter(user=request.user, payed = 'T')
@@ -1217,6 +1194,7 @@ def brands(request):
     return render(request ,'brands.html' , context)
 
 
+
 def faq(request):
     context = {
         'title': 'FAQ',
@@ -1257,6 +1235,7 @@ def terms_and_conditions(request):
         ]
     }
     return render(request ,'terms-and-conditions.html' , context)
+
 
 
 @login_required(login_url="login")
@@ -1342,3 +1321,52 @@ def wishlist(request):
     }
     return render(request, 'wishlist.html', context)
 
+
+
+
+
+
+"""from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
+
+def search_post(request , search=None):
+    if request.method =='POST':
+        user_search = request.POST.get('search')
+        
+        if user_search:
+            post_results1 = Post.objects.filter(body__icontains= user_search)
+            post_results2 = Post.objects.filter(title__icontains= user_search)
+            posts = post_results1 | post_results2
+
+            if search:
+                posts.filter(slug__in= search)
+            
+            paginator = Paginator(posts , 6)
+            page = request.GET.get('page')
+
+            try:
+                posts = paginator.page(page)
+            except PageNotAnInteger:
+                posts = paginator.page(1)
+            except EmptyPage:
+                posts = paginator.page(paginator.num_pages)
+            
+            return render(request , 'blog-classic.html' , {'posts':posts , 'page':page })
+    
+    post_results = Post.objects.all()
+    posts = post_results
+    if search:
+        posts.filter(slug__in= search)
+        
+    paginator = Paginator(posts , 6)
+    page = request.GET.get('page')
+
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+    return render(request , 'blog-classic.html' , {'posts':posts , 'page':page })
+"""

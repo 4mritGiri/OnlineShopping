@@ -1,11 +1,11 @@
 import os
-from decouple import Config
-from pathlib import Path
-
-
 import django
+from pathlib import Path
+from decouple import Config
 from django.utils.encoding import force_str
 django.utils.encoding.force_text = force_str
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,11 +25,17 @@ AUTH_USER_MODEL='shop.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1:8000']
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
-USE_L10N = True
+BROWSER_SESSION_COOKIE_SECURE = True
+BROWSER_CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
+SESSION_SAVE_EVERY_REQUEST = True
+
 
 # Application definition
-
 DJANGO_DEFAULT_APPS = [
     'unfold',
     'django.contrib.admin',
