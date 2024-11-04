@@ -13,7 +13,7 @@ import os
 
 
 def get_upload_path(instance, filename, folder_name):
-    return os.path.join(f'static/images/{folder_name}/', strftime("%Y%m%d-%H%M%S", gmtime()) + filename)
+    return os.path.join(f'images/{folder_name}/', strftime("%Y%m%d-%H%M%S", gmtime()) + filename)
 
 def get_profile_upload_path(instance, filename):
     return get_upload_path(instance, filename, 'profile')

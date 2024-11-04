@@ -77,7 +77,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 ROOT_URLCONF = 'config.urls'
 
-TEMPLATES_DIR = BASE_DIR / 'media/templates/'
+TEMPLATES_DIR = BASE_DIR / 'templates/'
 
 TEMPLATES = [
     {
@@ -150,14 +150,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR / 'media/static/'),   
+    os.path.join(BASE_DIR / 'static/'),   
 ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR / 'media')
 
 SVG_DIRS=[
-    os.path.join(BASE_DIR / 'media/static/')
+    os.path.join(BASE_DIR / 'static/')
 ]
 
 
