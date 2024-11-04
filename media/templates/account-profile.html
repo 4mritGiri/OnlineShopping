@@ -1,0 +1,98 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% load widget_tweaks %}
+
+{% block title%}{{ block.super }} {% endblock %}
+
+{% block body %}
+{% if user.is_authenticated %}
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="page-header">
+				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=title %}
+			</div>
+			<div class="block">
+				<div class="container">
+					<div class="row">
+						{% include 'components/account-navigation.html' %}
+							<div class="col-12 col-lg-9 mt-4 mt-lg-0">
+								<div class="card">
+									<div class="card-header">
+										<h5>Edit Profile</h5></div>
+									<div class="card-divider"></div>
+									<div class="card-body">
+										<div class="row no-gutters">
+											<div class="col-12 col-lg-7 col-xl-6">
+												<form method="POST" action="{% url 'profile' %}">{% csrf_token %}
+
+													<div class="profile-card__avatar mb-6">
+														{% if user.avatar %}
+															<img src="{{ user.avatar.url }}" height="100" width="100" class="rounded-circle" style="object-fit: cover;" alt="">
+														{% else %}
+															<img src="{% static 'images/avatar.png' %}" height="100" width="100" class="rounded-circle" style="object-fit: cover;" alt="">
+														{% endif %}
+													</div>
+													<br>
+													<div class="form-group">
+														<label for="profile-avatar">Avatar</label>
+														{{ form.avatar |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-username">Username</label>
+														{{ form.username |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-first-name">First Name</label>
+														{{ form.first_name |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-last-name">Last Name</label>
+														{{ form.last_name |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-email">Email</label>
+														{{ form.email |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-phone">Phone</label>
+														{{ form.phone |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-city">City</label>
+														{{ form.city |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-state">State</label>
+														{{ form.state |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-postcode">Postal Code</label>
+														{{ form.postcode |add_class:"form-control" }}
+													</div>
+													
+													<div class="form-group">
+														<label for="profile-khabarname">Newsletter</label>
+														{{ form.newsletter |add_class:"form-control" }}
+													</div>
+													<div class="form-group">
+														<label for="profile-address">Address</label>
+														{{ form.address |add_class:"form-control" }}
+													</div>
+													<div class="form-group mt-5 mb-0">
+														<button class="btn btn-primary">Save</button>
+													</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- site__body / end -->
+{% endif %}	
+{% endblock %}
+		

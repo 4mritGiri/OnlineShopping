@@ -1,0 +1,148 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{block.super}} {% endblock %}
+
+
+{% block body %}
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="page-header">
+				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=title %}
+			</div>
+			<div class="cart block">
+				<form method = "post">
+				{% csrf_token %}
+				<div class="container">
+					<table class="cart__table cart-table">
+						<thead class="cart-table__head">
+							<tr class="cart-table__row">
+								<th class="cart-table__column cart-table__column--image">Image</th>
+								<th class="cart-table__column cart-table__column--product">Product</th>
+								<th class="cart-table__column cart-table__column--price">Price</th>
+								<th class="cart-table__column cart-table__column--quantity">Quantity</th>
+								<th class="cart-table__column cart-table__column--total">Total</th>
+								<th class="cart-table__column cart-table__column--remove"></th>
+							</tr>
+						</thead>
+						<tbody class="cart-table__body">
+							{% for i in carts %}
+							<tr class="cart-table__row">
+								<td class="cart-table__column cart-table__column--image">
+									<a href="{% url 'ProductDetailView' i.product.slug %}"><img src='{{ i.product.pic0.url }}' alt='{{i.product.name}}' title='{{i.product.name}}'  style="width: 50px; height: 50px;" /></a>
+								</td>
+								<td class="cart-table__column cart-table__column--product text-capitalize"><a href="{% url 'ProductDetailView' i.product.slug %}" class="cart-table__product-name">{{i.product.name}}</a>
+									<ul class="cart-table__options">
+										<li>Color: <span class="px-2 rounded" style="background-color: {{ i.color.name }};">{{ i.color.name }}</span></li>
+										<li>Material: {{ i.material.name }}</li>
+										<li>Size: <span style="font-family: Roboto;">{{ i.size.sizeno }}</span></li>
+									</ul>
+								</td>
+								<td style="font-family: Roboto;" class="cart-table__column cart-table__column--price" data-title="Price"> Rs. {{ i.seller.price }}</td>
+
+								<td class="cart-table__column cart-table__column--quantity" data-title="Quantity">
+									
+									<div class="input-number">
+										
+										<div class="input-number__sub" ></div>
+										<div class="input-number__add"></div>
+										<input type='hidden'  name='product_slug' value="{{ i.product.slug }}" >
+										<input style="font-family: Roboto;" class="form-control input-number__input" type="number" name="quantity"  min="1" value="{{ i.count }}" max = "{{ i.seller.instock }}" id="count" onchange="refresh()">
+										
+										<script type="text/javascript">
+											function refresh()
+											{
+												var count = document.getElementById('count').value;
+												var single = "{{ i.seller.price }}";
+												var off = "{{ i.seller.off }}";
+												var result = (count * single) * (1 - off);
+												document.getElementById('total').innerHTML = result;
+											}
+										</script>
+									</div>
+								</td>
+								<td class="cart-table__column cart-table__column--total" data-title="Total" style="font-family: Roboto;"> Rs. {{ i.total }}</td>
+								
+								</td>
+								<td class="cart-table__column cart-table__column--remove">
+									<button type="submit" name="delete" class="btn btn-light btn-sm btn-svg-icon">
+										<svg width="12px" height="12px">
+											<use xlink:href="{% static 'images/sprite.svg' %}#cross-12"></use>
+										</svg>
+									</button>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					<table class="table-responsive">
+						
+						<tbody>
+							
+							<div class="cart__actions">
+								<th>
+									<form class="cart__coupon-form" method="post">
+										{% csrf_token %}
+										<label for="input-coupon-code" class="sr-only">Password</label>
+										<input type="text" class="form-control" id="input-coupon" placeholder="Coupon Code" name="couponCode">
+									</form>
+								</th>
+								<th>
+									<button type="submit" name='applyCoupon' class="btn btn-primary" id="button-coupon">Apply Coupon</button>	
+								</th>
+								<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+								<th>
+									{% if not user.is_authenticated %}
+									<div class="cart__buttons"><a href="{% url 'track-order' %}" class="btn btn-light">Continue Shopping</a></div>
+									{% endif %}
+									<a  href="" class="btn btn-primary cart__update-button" type="submit" name="update" >Update Cart</a></i>
+								</th>
+							</div>
+						</tbody>
+					</table>	
+					
+					<div class="row justify-content-end pt-5">
+						<div class="col-12 col-md-7 col-lg-6 col-xl-5">
+							<div class="card">
+								<div class="card-body">
+									<h3 class="card-title">Total Cart</h3>
+									<table class="cart__totals">
+										<thead class="cart__totals-header">
+											<tr>
+												<th>Sum</th>
+												<td>Rs. {{ totalPrice }}</td>
+											</tr>
+										</thead>
+										<tbody class="cart__totals-body">
+											<tr>
+												<th>Shipping</th>
+												<td>Rs. {{ sendCost }}
+													<div class="cart__calc-shipping"></div>
+												</td>
+											</tr>
+											<tr>
+												<th>Coupon</th>
+												<td>{{ coupon }} %</td>
+											</tr>
+											<tr>
+												<th>Tax</th>
+												<td>{{ tax }} %</td>
+											</tr>
+										</tbody>
+										<tfoot class="cart__totals-footer">
+											<tr>
+												<th>Total</th>
+												<td>Rs. {{ toPay }} </td>
+											</tr>
+										</tfoot>
+									</table><a class="btn btn-primary btn-xl btn-block cart__checkout-button" href="{% url 'checkout' %}">Payment</a></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				</form>
+			</div>
+		</div>
+		<!-- site__body / end -->
+{% endblock %}
+		

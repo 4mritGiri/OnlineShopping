@@ -1,0 +1,27 @@
+{% load static %}
+
+<div class="page-header__container container">
+   <div class="page-header__breadcrumb" style="margin-left: -25px!important;">
+      <nav aria-label="breadcrumb">
+         <ol class="breadcrumb">
+            {% for item in breadcrumb %}
+            <li class="breadcrumb-item" align="right">
+               {% if item.url %} 
+                  <a href="{{ item.url }}">{{ item.title }}</a>
+               {% else %}
+                  <span>{{ item.title }}</span>
+               {% endif %}
+               {% if not forloop.first %}
+                  <svg class="breadcrumb-arrow" width="6px" height="9px">
+                     <use xlink:href="{% static 'images/sprite.svg' %}#arrow-rounded-left-6x9"></use>
+                  </svg>
+               {% endif %}
+            </li>
+            {% endfor %}
+         </ol>
+      </nav>
+   </div>
+   <div class="page-header__title" style="margin-bottom: -30px; margin-top: -10px;">
+      <h1 class="text-capitalize" style="font-family: 'Poppins', sans-serif;">{{ title }}</h1>
+   </div>
+</div>

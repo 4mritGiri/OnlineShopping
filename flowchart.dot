@@ -1,0 +1,32 @@
+digraph G {
+    rankdir=LR; // Set the direction of the graph to left-to-right for a more square layout
+
+    subgraph cluster_0 {
+        label="User Interactions";
+        User -> {ProductInstance WishList Compare Post Comments Cart Salled ContactUs};
+    }
+
+    subgraph cluster_1 {
+        label="Product Relations";
+        Product -> {ProductInstance WishList Compare Comments Cart};
+    }
+
+    subgraph cluster_2 {
+        label="Category and Brand";
+        ProductCategory -> {Product CarouselBanner};
+        Brand -> Product;
+    }
+
+    subgraph cluster_3 {
+        label="State and Coupon";
+        States -> {User Salled};
+        Coupon -> Cart;
+    }
+
+    subgraph cluster_4 {
+        label="Product Attributes";
+        {ProductSize Color Materials} -> Product;
+    }
+
+    Cart -> Salled;
+}

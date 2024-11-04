@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %} {{ block.super }} 404 {% endblock %}
+
+{% block body%}
+
+		<!-- site__body -->
+		<div class="site__body" dir="ltr">
+			<div class="block">
+				<div class="container">
+					<div class="not-found">
+						<div class="not-found__404">Oops! Error 404</div>
+						<div class="not-found__content">
+							<h1 class="not-found__title">Page Not Found</h1>
+							<p class="not-found__text">We couldn't find the page you were looking for.
+								<br>Please use the search.</p>
+							<form class="not-found__search" method="POST" action="#" enctype="multipart/form-data" accept-charset='utf-8'>
+								{% csrf_token %}
+								<input type="text" class="not-found__search-input form-control" placeholder="Search term...">
+								<button type="submit" class="not-found__search-button btn btn-primary">Search</button>
+							</form>
+							<p class="not-found__text">Or go to the home page to start over.</p><a class="btn btn-secondary btn-sm" href="{% url 'index' %}">Go to Home Page</a></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- site__body / end -->
+		
+{% endblock %}

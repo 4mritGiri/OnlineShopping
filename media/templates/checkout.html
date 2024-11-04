@@ -1,0 +1,248 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ block.super }} {% endblock %}
+
+{% block body %}
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="page-header">
+				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=title %}
+			</div>
+			<form method = 'post'>
+				{% csrf_token %}
+			<div class="checkout block" >
+				<div class="container" >
+					<div class="row justify-content-between" >
+
+						{% if not user.is_authenticated %}
+						<div class="col-12 mb-3">
+							<div class="alert alert-lg alert-primary">Do you have an account? <a href="{% url 'login' %}">Log in to your account</a></div>
+						</div>
+						<div class="col-12 col-lg-6 col-xl-7">
+							<div class="card mb-lg-0">
+								<div class="card-body">
+									<h3 class="card-title">Payment Details</h3>
+									<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="checkout-first-name">First Name</label>
+											<input type="text" class="form-control" id="checkout-first-name" placeholder="First Name">
+										</div>
+										<div class="form-group col-md-6">
+											<label for="checkout-last-name">Last Name</label>
+											<input type="text" class="form-control" id="checkout-last-name" placeholder="Last Name">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="checkout-company-name">Company Name <span class="text-muted">(Optional)</span></label>
+										<input type="text" class="form-control" id="checkout-company-name" placeholder="Company Name">
+									</div>
+									<div class="form-group">
+										<label for="checkout-country">Country</label>
+										<select id="checkout-country" class="form-control">
+											<option>Select a country ...</option>
+											<option>Iran</option>
+											<option>United States</option>
+											<option>Russia</option>
+											<option>Italy</option>
+											<option>France</option>
+											<option>Ukraine</option>
+											<option>Germany</option>
+											<option>Australia</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label for="checkout-street-address">Street Address</label>
+										<input type="text" class="form-control" id="checkout-street-address" placeholder="Street Address">
+									</div>
+									<div class="form-group">
+										<label for="checkout-address">Apartment, Suite, etc. <span class="text-muted">(Optional)</span></label>
+										<input type="text" class="form-control" id="checkout-address">
+									</div>
+									<div class="form-group">
+										<label for="checkout-city">City / Town</label>
+										<input type="text" class="form-control" id="checkout-city">
+									</div>
+										<div class="form-group">
+										<label for="checkout-state">State</label>
+										<input type="text" class="form-control" id="checkout-state">
+									</div>
+										<div class="form-group">
+										<label for="checkout-postcode">Postal Code</label>
+										<input type="text" class="form-control" id="checkout-postcode">
+									</div>
+									<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="checkout-email">Email Address</label>
+											<input type="email" class="form-control" id="checkout-email" placeholder="Email Address">
+										</div>
+										<div class="form-group col-md-6">
+											<label for="checkout-phone">Phone</label>
+											<input type="text" class="form-control" id="checkout-phone" placeholder="Phone">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="form-check"><span class="form-check-input input-check"><span class="input-check__body"><input class="input-check__input" type="checkbox" id="checkout-create-account"> <span class="input-check__box"></span>
+											<svg class="input-check__icon" width="9px" height="7px">
+												<use xlink:href="{% static 'images/sprite.svg' %}#check-9x7"></use>
+											</svg>
+											</span>
+											</span>
+											<label class="form-check-label" for="checkout-create-account">Create an account?</label>
+										</div>
+									</div>
+								</div>
+								<div class="card-divider"></div>
+								<div class="card-body">
+									<h3 class="card-title">Shipping Details</h3>
+									<div class="form-group">
+										<div class="form-check"><span class="form-check-input input-check"><span class="input-check__body"><input class="input-check__input" type="checkbox" id="checkout-different-address"> <span class="input-check__box"></span>
+											<svg class="input-check__icon" width="9px" height="7px">
+												<use xlink:href="{% static 'images/sprite.svg' %}#check-9x7"></use>
+											</svg>
+											</span>
+											</span>
+											<label class="form-check-label" for="checkout-different-address">Ship to a different address?</label>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="checkout-comment">Order Notes <span class="text-muted">(Optional)</span></label>
+										<textarea id="checkout-comment" class="form-control" rows="4"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						<div class="col-12 col-lg-6 col-xl-6 mt-4 mt-lg-0" >
+							<div class="card mb-0" >
+								<div class="card-body">
+									<h3 class="card-title">Your Order</h3>
+									<table class="checkout__totals" style="margin-bottom: -25px;">
+										<thead class="checkout__totals-header">
+											<tr>
+												<th>Product</th>
+												<th>Quantity</th>
+												<th>Product Price</th>
+												<th>Discount</th>
+												<th>Total</th>
+											</tr>
+										</thead>
+										<tbody class="checkout__totals-products">
+											{% for i in carts %}
+											<tr>
+												<td class="text-left">
+													<a href={% url 'ProductDetailView' i.product.slug %}><img style="width: 50px; height: 70px;" src={{ i.product.pic0.url }} alt={{ i.product.name }} title={{ i.product.name }} class="img-thumbnail"></a><br/>
+													<a href={% url 'ProductDetailView' i.product.slug %}>{{ i.product.name }}</a>
+												</td>
+												<td class="text-left">{{ i.count }}</td>
+												<td class="text-left">Rs. {{ i.seller.price }}</td>
+												<td class="text-left"> {% if i.seller.off %}{{ i.seller.off }} %{% else %} None {% endif %}</td>
+												<td class="text-left" >Rs. {{ i.final_price }}</td>
+											</tr>
+											{% endfor %}
+										</tbody>
+										
+										<tbody class="checkout__totals-subtotals" >
+											<tr>
+												<th  colspan="4">Subtotal</th>
+												<td>Rs. {{ totalPrice }}</td>
+											</tr>
+											<tr>
+												<th  colspan="4">Discount Coupon</th>
+												<td>{{ coupon }} %</td>
+											</tr>
+											<tr>
+												<th  colspan="4">Shipping</th>
+												<td>Rs. {{ sendCost }}</td>
+											</tr>
+											<tr>
+												<th  colspan="4">Tax</th>
+												<td>{{ tax }} %</td>
+											</tr>
+										</tbody>
+										
+										<tfoot class="checkout__totals-footer">
+											<tr>
+												<th  colspan="3">Total</th>
+												<td  colspan="4" >Rs. {{ toPay }}</td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-lg-6 col-xl-6 mt-4 mt-lg-0" >
+							<div class="card" style="margin-bottom: -20px; margin-top: -110px;">
+								<div class="card-body">
+									{% for field in form %}
+									<div class="form-group required">
+										<label for="input-payment-lastname" class="control-label">{{ field.label_tag }}</label>
+										{{ field }}
+										{% if field.errors %}
+										<span class="text-danger">{{ field.errors }}</span>
+										{% endif %}
+									</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="mt-4 mt-lg-0" >
+						<div class="card mb-0" >
+							<div class="card-body">
+								{% comment %} <h3 class="card-title">Your Order</h3>									 {% endcomment %}
+								<div class="payment-methods">
+									<ul class="payment-methods__list">
+										<li class="payment-methods__item payment-methods__item--active">
+											<label class="payment-methods__item-header"><span class="payment-methods__item-radio input-radio"><span class="input-radio__body"><input class="input-radio__input" name="checkout_payment_method" type="radio" checked> <span class="input-radio__circle"></span> </span>
+												</span><span class="payment-methods__item-title">Bank Transfer</span></label>
+											<div class="payment-methods__item-container">
+												<div class="payment-methods__item-description text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+											</div>
+										</li>
+										<li class="payment-methods__item">
+											<label class="payment-methods__item-header"><span class="payment-methods__item-radio input-radio"><span class="input-radio__body"><input class="input-radio__input" name="checkout_payment_method" type="radio"> <span class="input-radio__circle"></span> </span>
+												</span><span class="payment-methods__item-title">Check Payment</span></label>
+											<div class="payment-methods__item-container">
+												<div class="payment-methods__item-description text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+											</div>
+										</li>
+										<li class="payment-methods__item">
+											<label class="payment-methods__item-header"><span class="payment-methods__item-radio input-radio"><span class="input-radio__body"><input class="input-radio__input" name="checkout_payment_method" type="radio"> <span class="input-radio__circle"></span> </span>
+												</span><span class="payment-methods__item-title">Cash on Delivery</span></label>
+											<div class="payment-methods__item-container">
+												<div class="payment-methods__item-description text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+											</div>
+										</li>
+										<li class="payment-methods__item">
+											<label class="payment-methods__item-header"><span class="payment-methods__item-radio input-radio"><span class="input-radio__body"><input class="input-radio__input" name="checkout_payment_method" type="radio"> <span class="input-radio__circle"></span> </span>
+												</span><span class="payment-methods__item-title">Online Payment</span></label>
+											<div class="payment-methods__item-container">
+												<div class="payment-methods__item-description text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="checkout__agree form-group">
+									<div class="form-check"><span class="form-check-input input-check"><span class="input-check__body"><input class="input-check__input" type="checkbox" required="" class="validate required" id="confirm_agree" name="confirm agree" onchange="document.getElementById('button-confirm').disabled = !this.checked;"> <span class="input-check__box"></span>
+										<svg class="input-check__icon" width="9px" height="7px">
+											<use xlink:href="{% static 'images/sprite.svg' %}#check-9x7"></use>
+										</svg>
+										</span>
+										</span>
+										
+										<label  class="form-check-label" for="checkout-terms">I have read and agree to the <a target="_blank" href="{% url 'terms_and_conditions' %}">terms and conditions</a> *</label>
+									</div>
+								</div>
+								
+								<button type="submit" name="GoToPay" class="btn btn-primary btn-xl btn-block" id="button-confirm" disabled>Place Order</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</form>
+		</div>
+		<!-- site__body / end -->
+{% endblock %}
+		

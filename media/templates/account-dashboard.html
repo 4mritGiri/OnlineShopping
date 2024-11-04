@@ -1,0 +1,94 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title%}{{ block.super }} Dashboard {% endblock %}
+
+
+{% block body %}
+{% if user.is_authenticated %}
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="page-header">
+				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=title %}
+			</div>
+			<div class="block">
+				<div class="container">
+					<div class="row">
+						{% include 'components/account-navigation.html' %}
+						<div class="col-12 col-lg-9 mt-4 mt-lg-0">
+							<div class="dashboard">
+								<div class="dashboard__profile card profile-card">
+									<div class="card-body profile-card__body">
+										<div class="profile-card__avatar">
+											{% if user.avatar %}
+												<img src="{{ user.avatar.url }}" height="100" width="100" class="rounded-circle" style="object-fit: cover;" alt="">
+											{% else %}
+												<img src="{% static 'images/avatar.png' %}" height="100" width="100" class="rounded-circle" style="object-fit: cover;" alt="">
+											{% endif %}
+										</div>
+										<div class="profile-card__name">{% if user.first_name %} {{user.first_name}} {{user.last_name}} {% else %} {{user.username}} {% endif %}</div>
+										<div class="profile-card__email">{{user.email}}</div>
+										<div class="profile-card__edit"><a href="{% url 'profile' %}" class="btn btn-secondary btn-sm">Edit Profile</a></div>
+									</div>
+								</div>
+								<div class="dashboard__address card address-card address-card--featured">
+									<div class="address-card__badge">Default Address</div>
+									<div class="address-card__body">
+										<div class="address-card__name">{% if user.first_name %} {{user.first_name}} {{user.last_name}} {% else %} {{user.username}} {% endif %}</div>
+										<div class="address-card__row">{{user.address}}</div>
+										<div class="address-card__row">
+											<div class="address-card__row-title">Phone Number</div>
+											<div class="address-card__row-content"><span class="ltr_text">{{user.phone}}</span></div>
+										</div>
+										<div class="address-card__row">
+											<div class="address-card__row-title">Email</div>
+											<div class="address-card__row-content">{{user.email}}</div>
+										</div>
+										<div class="address-card__footer"><a href="{% url 'profile' %}">Edit Address</a></div>
+									</div>
+								</div>
+								<div class="dashboard__orders card">
+									<div class="card-header">
+										<h5>Recent Orders</h5></div>
+									<div class="card-divider"></div>
+									<div class="card-table">
+										<div class="table-responsive-sm">
+											<table>
+												<thead>
+													<tr>
+														<th>Order</th>
+														<th>Product Name</th>
+														<th>Status</th>
+														<th>Seller</th>
+														<th>Count</th>
+														<th>Total</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% for cart in sold %}
+													{% if  forloop.counter < lenSold %}
+													<tr>
+														<td><a href="#">#{{ cart.id }}</a></td>
+														<td>{{ cart.product }}</td>
+														<td>{{ cart.payed }}</td>
+														<td>{{ cart.seller }}</td>
+														<td>{{ cart.count }}</td>
+														<td>{{ cart.final_price }}</td>
+													</tr>
+													{% endif %}
+													{% endfor %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- site__body / end -->
+{% endif %}
+{% endblock %}
+		

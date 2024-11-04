@@ -1,0 +1,36 @@
+
+{% extends 'main/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title%}{{ block.super }} Register {% endblock %}
+
+{% block body %}
+    <!-- site__body -->
+    <div class="site__body" align="center">
+        <div class="page-header">
+            <div class="page-header__container container">
+                {% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=" " %}
+            </div>
+            {% for message in messages %}
+                <strong><i style="color: green;">{{message}}</i></strong>
+            {% endfor %} 
+            <div  class="col-md-5 d-flex mt-md-1" style="margin-top: -60px !important;">
+                <div class="card flex-grow-1 mb-5" >
+                    <div class="card-body" align="left">
+                        <h3 style="margin-top: -60px !important; background-color: white; width: 7rem;">Register</h3>
+                        <form action="/signup" method="post">
+                            {% csrf_token %}
+                            {% include 'components/input-field.html' with type="text" name="username" label='Username' required=True %}
+                            {% include 'components/input-field.html' with type="email" name="email" label='Email' required=True %}
+                            {% include 'components/input-field.html' with type="password" name="password" label='Password' required=True %}
+                            {% include 'components/input-field.html' with type="password" name="comfirmpwd" label='Confirm Password' required=True %}
+                            Have an account? <a href="{% url 'login' %}">Login </a><br>
+                            <button type="submit" class="btn btn-primary mt-4">Register</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

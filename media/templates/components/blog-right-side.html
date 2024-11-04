@@ -1,0 +1,127 @@
+{% load static %}
+<div class="col-12 col-lg-4">
+   <div class="block block-sidebar block-sidebar--position--end">
+      <div class="block-sidebar__item">
+         <div class="widget-search">
+            <form class="widget-search__body">
+               <input class="widget-search__input" placeholder="Blog search..." type="text" autocomplete="off" spellcheck="false">
+               <button class="widget-search__button" type="submit">
+                  <svg width="20px" height="20px">
+                     <use xlink:href="{% static 'images/sprite.svg' %}#search-20"></use>
+                  </svg>
+               </button>
+            </form>
+         </div>
+      </div>
+      <div class="block-sidebar__item">
+         <div class="widget-aboutus widget">
+            <h4 class="widget__title">About the blog</h4>
+            <div class="widget-aboutus__text text-capitalize">
+               {% lorem 12 w random %}
+            </div>
+            {% include "components/socials-share.html" %}
+         </div>
+      </div>
+      <div class="block-sidebar__item">
+         <div class="widget-categories widget-categories--location--blog widget">
+            <h4 class="widget__title">Categories</h4>
+            <ul class="widget-categories__list" data-collapse data-collapse-opened-class="widget-categories__item--open">
+               <li class="widget-categories__item" data-collapse-item>
+                  <div class="widget-categories__row">
+                     <a href="#">
+                        <svg class="widget-categories__arrow" width="6px" height="9px">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#arrow-rounded-right-6x9"></use>
+                        </svg> Latest News</a>
+                  </div>
+               </li>
+               <li class="widget-categories__item" data-collapse-item>
+                  <div class="widget-categories__row">
+                     <a href="#">
+                        <svg class="widget-categories__arrow" width="6px" height="9px">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#arrow-rounded-right-6x9"></use>
+                        </svg> Special Offers </a>
+                     <button class="widget-categories__expander" type="button" data-collapse-trigger></button>
+                  </div>
+                  <div class="widget-categories__subs" data-collapse-content>
+                     <ul style="padding-left: 15px;">
+                        <li><a href="#">🌸 Spring Sales</a></li>
+                        <li><a href="#">🌞 Summer Sales</a></li>
+                        <li><a href="#">🍂 Fall Sales</a></li>
+                        <li><a href="#">❄️ Winter Sales</a></li>
+                        <li><a href="#">🎁 Other Sales</a></li>
+                     </ul>
+                  </div>
+               </li>
+               {% for p in posts|slice:":8" %}
+               <li class="widget-categories__item" data-collapse-item>
+                  <div class="widget-categories__row">
+                     <a href="{% url 'PostDetailView' p.slug %}">
+                        <svg class="widget-categories__arrow" width="6px" height="9px">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#arrow-rounded-right-6x9"></use>
+                        </svg> {{p.title}}</a>
+                  </div>
+               </li>
+               {% endfor %}
+            </ul>
+         </div>
+      </div>
+      <div class="block-sidebar__item">
+         <div class="widget-posts widget">
+            <h4 class="widget__title">Latest Posts</h4>
+            <div class="widget-posts__list">
+               {% for p in posts|slice:":8" %}
+               <div class="widget-posts__item">
+                  <div class="widget-posts__image mr-2">
+                     {% if p.pic %}
+                     <a href="#"><img src="{{p.pic.url}}" alt=""></a>
+                     {% else %}
+                     <a href="#"><img src="{% static "images/posts/post-1-thumbnail.jpg" %}" alt=""></a>
+                     {% endif %}
+                  </div>
+                  <div class="widget-posts__info">
+                     <div class="widget-posts__name"><a href="{% url 'PostDetailView' p.slug %}">{{p.title}}</a></div>
+                     <div class="widget-posts__date">{{p.published_date|date:"d F Y"}}</div>
+                  </div>
+               </div>
+               {% endfor %}
+            </div>
+         </div>
+      </div>
+      <div class="block-sidebar__item">
+         {% include "components/newsletter-widget.html" %}
+      </div>
+      <div class="block-sidebar__item">
+         <div class="widget-comments widget">
+            <h4 class="widget__title">Latest Comments</h4>
+            <ul class="widget-comments__list">
+               {% for p in posts|slice:":8" %}
+               <li class="widget-comments__item">
+                  <div class="widget-comments__author">
+                     <a href="#">{{p.created_by.first_name}} {{p.created_by.last_name}}</a>
+                  </div>
+                  <div class="widget-comments__content">
+                     {{p.short_description|truncatechars:40}}
+                  </div>
+                  <div class="widget-comments__meta">
+                     <div class="widget-comments__date">{{p.published_date|date:"d F Y"}}</div>
+                     <div class="widget-comments__name">in <a href="{% url 'PostDetailView' p.slug %}" title="{{p.title}}">{{p.title}}</a></div>
+                  </div>
+               </li>
+               {% endfor %}
+            </ul>
+         </div>
+      </div>
+      <div class="block-sidebar__item">
+         <div class="widget-tags widget">
+            <h4 class="widget__title">Tags</h4>
+            <div class="tags tags--lg">
+               <div class="tags__list">
+                  {% for t in tags|slice:":10" %}
+                  <a href="#">{{t.name}}</a>
+                  {% endfor %}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

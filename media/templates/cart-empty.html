@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ block.super }}{% endblock %}
+
+
+{% block body %}
+
+
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="page-header">
+				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=title %}
+			</div>
+			<div class="block-empty__body">
+				<div class="block-empty__message font-weight-bold" style="font-size: 30px;">Shopping Cart is empty!</div>
+				<div class="block-empty__actions">
+					<a class="btn btn-primary btn-sm rounded-pill" href="{% url 'index' %}">Return to Home</a>
+					{% if not request.user.is_authenticated %}
+					<a class="btn btn-primary btn-sm rounded-pill" href="{% url 'login' %}">Login Now</a>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<!-- site__body / end -->
+{% endblock %}
+		

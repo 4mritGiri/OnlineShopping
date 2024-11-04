@@ -1,0 +1,180 @@
+{% load static %}
+{% with prd=product %}
+<div class="block-products-carousel__column">
+   <div class="block-products-carousel__cell">
+      <div class="product-card">
+      <form  method ='Post'>
+         {% csrf_token %}
+         <button class="product-card__quickview" type="button">
+            <svg width="16px" height="16px">
+               <use xlink:href="{% static 'images/sprite.svg' %}#quickview-16"></use>
+            </svg> <span class="fake-svg-icon"></span></button>
+         <div class="product-card__badges-list">
+            <div class="product-card__badge product-card__badge--new">New</div>
+         </div>
+         <div class="product-card__image">
+            <a href="{% url 'ProductDetailView' prd.slug %}"><img src="{{ prd.pic0.url }}" alt="{{ prd.name }}" title="{{ prd.name }}" class="img-responsive" /></a>
+         </div>
+         <div class="product-card__info">
+            <div class="product-card__name"><a href="{% url 'ProductDetailView' prd.slug %}">{{ prd.name }}</a></div>
+         
+            <div class="product-card__rating">
+               <div class="rating">
+                  <div class="rating__body">
+                     <svg class="rating__star rating__star--active" width="13px" height="12px">
+                        <g class="rating__fill">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+                        </g>
+                        <g class="rating__stroke">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+                        </g>
+                     </svg>
+                     <div class="rating__star rating__star--only-edge rating__star--active">
+                        <div class="rating__fill">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                        <div class="rating__stroke">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                     </div>
+                     <svg class="rating__star rating__star--active" width="13px" height="12px">
+                        <g class="rating__fill">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+                        </g>
+                        <g class="rating__stroke">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+                        </g>
+                     </svg>
+                     <div class="rating__star rating__star--only-edge rating__star--active">
+                        <div class="rating__fill">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                        <div class="rating__stroke">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                     </div>
+                     <svg class="rating__star rating__star--active" width="13px" height="12px">
+                        <g class="rating__fill">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+                        </g>
+                        <g class="rating__stroke">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+                        </g>
+                     </svg>
+                     <div class="rating__star rating__star--only-edge rating__star--active">
+                        <div class="rating__fill">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                        <div class="rating__stroke">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                     </div>
+                     <svg class="rating__star rating__star--active" width="13px" height="12px">
+                        <g class="rating__fill">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+                        </g>
+                        <g class="rating__stroke">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+                        </g>
+                     </svg>
+                     <div class="rating__star rating__star--only-edge rating__star--active">
+                        <div class="rating__fill">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                        <div class="rating__stroke">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                     </div>
+                     <svg class="rating__star" width="13px" height="12px">
+                        <g class="rating__fill">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+                        </g>
+                        <g class="rating__stroke">
+                           <use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+                        </g>
+                     </svg>
+                     <div class="rating__star rating__star--only-edge">
+                        <div class="rating__fill">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                        <div class="rating__stroke">
+                           <div class="fake-svg-icon"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="product-card__rating-legend">9 reviews</div>
+            </div>
+            <ul class="product-card__features-list">
+               <label>
+                  {% for size in prd.size.all %}
+                  <input type="text" name="Size" value="{{ size.id }}"> 
+                  <span>{{ size.sizeno }}</span>
+                  {% endfor %}
+               </label>
+               <label>
+                  {% for color in prd.color.all %}
+                  <input type="text" name="Color" value="{{ color.id }}"> 
+                  <span>{{ color.name }}</span>
+                  {% endfor %}
+               </label>
+               <label>
+                  {% for material in prd.material.all %}
+                  <input type="text" name="Material" value="{{ material.id }}"> 
+                  <span>{{ material.name }}</span>
+                  {% endfor %}
+               </label>
+               <label>
+                  {% for seller in prd.instances.all %}
+                  <input type="text" name="Seller" value="{{ seller.id }}"> 
+                  <span>{{ seller.name }}</span>
+                  {% endfor %}
+               </label>
+               <li>Speed: 750 RPM</li>
+               <li>Source: Electricity</li>
+               <li>Battery type: Lithium</li>
+               <li>Voltage: 20 Volts</li>
+               <li>Battery capacity: 2 hours</li>
+            </ul>
+         </div>
+         
+            <div class="product-card__actions">
+               <div class="product-card__availability">Availability: <span class="text-success">In stock</span></div>
+               {% for i in prd.instances.all %}
+               {% if i.instock == 0 %}
+               {% else %}
+               <div class="product-card__prices">{% if i.off == 0 %}<span class="new-price">{{ i.new_price }}</span>{% else %}<span class="product-card__new-price"> Rs.{{ i.new_price }}</span>{% endif %}{% if i.off == 0 %}{% else %}<span  class="product-card__old-price"> Rs.{{ i.price }}</span>{% endif %}</div>
+               {% endif %}
+               {% endfor %}
+               <div class="product-card__buttons">
+                  {% if user.is_authenticated %}
+                     {% for stok in prd.instances.all %}
+                     {% if stok.instock != 0 %}
+                        <button class="btn btn-primary product-card__addtocart" type="submit" id="button-cart" name='addCart'>Add to cart</button>
+                     {% else %}
+                        <button type="submit" class="btn btn-danger btn-lg" disabled>Out of stock</button>
+                     {% endif %}
+                     {% endfor %}
+                     
+                  {% else %}
+                     <a href={% url 'login' %}> <button type="button" id="Login" class="btn btn-primary btn-lg">Add to cart</button></a>
+                  {% endif %}
+
+                  <input type='hidden'  name='product' value="{{ prd.id }}" >
+                  <button type="submit"  class="btn btn-light btn-svg-icon btn-svg-icon--fake-svg product-card__wishlist" name="addWishlist" >
+                     <svg width="16px" height="16px">
+                        <use xlink:href="{% static 'images/sprite.svg' %}#wishlist-16"></use>
+                     </svg> <span class="fake-svg-icon fake-svg-icon--wishlist-16"></span></button>
+                     
+                     <input type='hidden'  name='product' value="{{ prd.id }}" >
+                     <button  type="submit"  class="btn btn-light btn-svg-icon btn-svg-icon--fake-svg product-card__compare"  name="addCompare" >
+                     <svg width="16px" height="16px">
+                        <use xlink:href="{% static 'images/sprite.svg' %}#compare-16"></use>
+                     </svg> <span class="fake-svg-icon fake-svg-icon--compare-16"></span></button>
+                  </div>
+               </div>
+            </div>
+      </form>
+   </div>
+</div>
+{% endwith %}

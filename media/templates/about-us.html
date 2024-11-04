@@ -1,0 +1,50 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block body %}
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="block about-us">
+				<div class="about-us__image"></div>
+				<div class="container">
+					<div class="row justify-content-center">
+						<div class="col-12 col-xl-10">
+							<div class="about-us__body">
+								<h1 class="about-us__title">About Us</h1>
+								<div class="about-us__text typography">
+									<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+									<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+								</div>
+								<div class="about-us__team">
+									<h2 class="about-us__team-title">Get to know our team</h2>
+									<div class="about-us__team-subtitle text-muted">Do you want to work with our team?
+										<br><a href="{% url 'contact-us' %}">Contact Us</a> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</div>
+									<div class="about-us__teammates teammates">
+										<div class="owl-carousel">
+											<div class="teammates__item teammate">
+												<div class="teammate__avatar"><img src='{% static "images/teammates/teammate-1.jpg" %}' alt=""></div>
+												<div class="teammate__name">Amrit Giri</div>
+												<div class="teammate__position text-muted">CTO</div>
+											</div>
+											<div class="teammates__item teammate">
+												<div class="teammate__avatar"><img src="{% static 'images/teammates/teammate-2.jpg' %}" alt=""></div>
+												<div class="teammate__name">Nep X. Infotech</div>
+												<div class="teammate__position text-muted">Developer</div>
+											</div>
+											<div class="teammates__item teammate">
+												<div class="teammate__avatar"><img src="{% static 'images/teammates/teammate-3.jpg' %}" alt=""></div>
+												<div class="teammate__name">Nep X. Infotech</div>
+												<div class="teammate__position text-muted">Financial Manager</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- site__body / end -->
+{% endblock %}
+		

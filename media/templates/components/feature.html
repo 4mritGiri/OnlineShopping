@@ -1,0 +1,13 @@
+{% load static %}
+
+<div class="block-features__item" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-basis: calc(25% - 20px); border: 1px solid #f0f0f0; border-radius: 5px;">
+   <div class="block-features__icon mr-2">
+      <svg width="48px" height="48px">
+         <use xlink:href="{% static 'images/sprite.svg' %}#{{ feature.icon }}"></use>
+      </svg>
+   </div>
+   <div class="block-features__content">
+      <div class="block-features__title">{{ feature.title }}</div>
+      <div class="block-features__subtitle">{{ feature.subtitle }}</div>
+   </div>
+</div>

@@ -1,0 +1,204 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ block.super }} Wishlist {% endblock %}
+
+{% block body %}
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="page-header">
+				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=title %}
+			</div>
+			<div class="block">
+				<div class="container">
+					
+					{% if wishlist %}
+					<table class="wishlist">
+						<thead class="wishlist__head">
+							<tr class="wishlist__row">
+								<th class="wishlist__column wishlist__column--image">Image</th>
+								<th class="wishlist__column wishlist__column--product">Product</th>
+								<th class="wishlist__column wishlist__column--stock">Stock</th>
+								<th class="wishlist__column wishlist__column--price">Price</th>
+								<th class="wishlist__column wishlist__column--tocart"></th>
+								<th class="wishlist__column wishlist__column--remove"></th>
+							</tr>
+						</thead>
+						<tbody class="wishlist__body">
+							{% for p in wishlist %}
+							<tr class="wishlist__row">
+								<td class="wishlist__column wishlist__column--image">
+									<a href="{% url 'ProductDetailView' p.product.slug %}"><img src="{{ p.product.pic0.url }}" alt=" {{ p.product.name }}"></a>
+								</td>
+								<td class="wishlist__column wishlist__column--product"><a href={% url 'ProductDetailView' p.product.slug %} class="wishlist__product-name"> {{ p.product.name }} </a>
+									<div class="wishlist__product-rating">
+										<div class="rating">
+											<div class="rating__body">
+												<svg class="rating__star rating__star--active" width="13px" height="12px">
+													<g class="rating__fill">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+													</g>
+													<g class="rating__stroke">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+													</g>
+												</svg>
+												<div class="rating__star rating__star--only-edge rating__star--active">
+													<div class="rating__fill">
+														<div class="fake-svg-icon"></div>
+													</div>
+													<div class="rating__stroke">
+														<div class="fake-svg-icon"></div>
+													</div>
+												</div>
+												<svg class="rating__star rating__star--active" width="13px" height="12px">
+													<g class="rating__fill">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+													</g>
+													<g class="rating__stroke">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+													</g>
+												</svg>
+												<div class="rating__star rating__star--only-edge rating__star--active">
+													<div class="rating__fill">
+														<div class="fake-svg-icon"></div>
+													</div>
+													<div class="rating__stroke">
+														<div class="fake-svg-icon"></div>
+													</div>
+												</div>
+												<svg class="rating__star rating__star--active" width="13px" height="12px">
+													<g class="rating__fill">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+													</g>
+													<g class="rating__stroke">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+													</g>
+												</svg>
+												<div class="rating__star rating__star--only-edge rating__star--active">
+													<div class="rating__fill">
+														<div class="fake-svg-icon"></div>
+													</div>
+													<div class="rating__stroke">
+														<div class="fake-svg-icon"></div>
+													</div>
+												</div>
+												<svg class="rating__star rating__star--active" width="13px" height="12px">
+													<g class="rating__fill">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+													</g>
+													<g class="rating__stroke">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+													</g>
+												</svg>
+												<div class="rating__star rating__star--only-edge rating__star--active">
+													<div class="rating__fill">
+														<div class="fake-svg-icon"></div>
+													</div>
+													<div class="rating__stroke">
+														<div class="fake-svg-icon"></div>
+													</div>
+												</div>
+												<svg class="rating__star" width="13px" height="12px">
+													<g class="rating__fill">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal"></use>
+													</g>
+													<g class="rating__stroke">
+														<use xlink:href="{% static 'images/sprite.svg' %}#star-normal-stroke"></use>
+													</g>
+												</svg>
+												<div class="rating__star rating__star--only-edge">
+													<div class="rating__fill">
+														<div class="fake-svg-icon"></div>
+													</div>
+													<div class="rating__stroke">
+														<div class="fake-svg-icon"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="wishlist__product-rating-legend">9 Reviews</div>
+									</div>
+								</td>
+								<td class="wishlist__column wishlist__column--stock">
+									<div class="badge badge-light">
+										{% for dtl in detail %}
+										{% if p.product.id == dtl.product_id %}
+											{% if dtl.instock != 0 %}
+													<span class="text-success">In Stock</span>
+											{% else %}
+											<span class="text-danger">Out of Stock</span>
+										
+										{% endif %}
+										{% endif %}
+										{% endfor %}
+									</div>
+										
+								</td>
+								<td class="wishlist__column wishlist__column--price">
+									
+									{% for dtl in detail %}
+										{% if dtl.instock != 0 %}
+											{% if p.product.id == dtl.product_id %}	
+												{% if dtl.off == 0 %}
+													<span style="font-family: Roboto;" class="new-price">
+													{{ dtl.new_price }}</span>
+												{% else %}
+													<span style="font-family: Roboto;" class="product-card__new-price">{{ dtl.new_price }} </span>
+												{% endif %}
+												{% if dtl.off == 0 %}
+													{% else %}
+													<span style="font-family: Roboto;"  class="product-card__old-price">
+														{{ dtl.price }} 
+													</span>
+												{% endif %}
+											{% endif %}
+										{% endif %}		
+									{% endfor %}
+								</td>
+								
+								
+								<td class="wishlist__column wishlist__column--tocart"  >
+									<form method="post">
+										{% csrf_token %}
+										<input type='hidden'  name='product' value="{{ p.product.id }}" >
+										<button class="btn btn-primary btn-sm product-card__addtocart" type="submit" id="button-cart" name='addCart'>Add to cart</button>
+									</form>
+								</td>
+								<form method="post">
+								{% csrf_token %}
+								<td class="wishlist__column wishlist__column--remove"  >
+									<input type='hidden'  name='product_slug' value="{{ p.product.slug }}" >
+									<button type="submit"  class="btn btn-light btn-sm btn-svg-icon"  name="delete" >
+										<svg width="12px" height="12px">
+											<use xlink:href="{% static 'images/sprite.svg' %}#cross-12"></use>
+										</svg>
+									</button>
+								</td>
+								</form>
+							</tr>
+							{% endfor %}
+						</tbody>
+					
+					</table>
+					{% else %}
+					<table class="wishlist">
+						<thead class="wishlist__head">
+							<tr class="wishlist__row">
+								<th class="wishlist__column wishlist__column--image">Image</th>
+								<th class="wishlist__column wishlist__column--product">Product</th>
+								<th class="wishlist__column wishlist__column--stock">Stock</th>
+								<th class="wishlist__column wishlist__column--price">Price</th>
+								<th class="wishlist__column wishlist__column--tocart"></th>
+								<th class="wishlist__column wishlist__column--remove"></th>
+							</tr>
+						</thead>
+					</table>
+					<td><br/><br/><center class="font-weight-bold" style="font-size: 30px;"> Your Wishlist is empty </center></td>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<!-- site__body / end -->
+
+{% endblock %}
+		

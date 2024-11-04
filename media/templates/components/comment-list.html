@@ -1,0 +1,39 @@
+{% load static humanize %}
+
+<section class="post__section">
+   <div class="block-header">
+      <h3 class="block-header__title" style="font-family: 'Vazir', sans-serif;">Comments ({{comments.count}})</h3>
+      <div class="block-header__divider"></div>
+      {% include 'components/arrows-list.html' %}
+   </div>
+   <ol class="comments-list comments-list--level--0">
+      {% for comment in comments|slice:":4" %}
+      <li class="comments-list__item">
+         <div class="comment">
+            <div class="comment__avatar">
+               <a href="#">
+                  {% if comment.writer.avatar %}
+                     <img src="{{comment.writer.avatar.url}}" alt="">
+                  {% else %}
+                     <img 
+                        src="{% static 'images/avatars/avatar-1.jpg' %}" 
+                        alt="{{comment.writer.first_name}} {{comment.writer.last_name}}"
+                  >
+                  {% endif %}
+               </a>
+            </div>
+            <div class="comment__content">
+               <div class="comment__header">
+                  <div class="comment__author"><a href="#">{{comment.writer.first_name}} {{comment.writer.last_name}}</a></div>
+                  <div class="comment__reply">
+                     <button type="button" class="btn btn-xs btn-light">Reply</button>
+                  </div>
+               </div>
+               <div class="comment__text">{{comment.body}}</div>
+               <div class="comment__date">{{comment.created_date|naturaltime}}</div>
+            </div>
+         </div>
+      </li>
+      {% endfor %}
+   </ol>
+</section>

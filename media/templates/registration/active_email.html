@@ -1,0 +1,6 @@
+{% autoescape off %}  
+Hello,  
+Click on the link below to activate your account,
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}  
+If you think this email is not for you, please ignore it.  
+{% endautoescape %}

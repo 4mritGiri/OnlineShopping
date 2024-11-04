@@ -1,0 +1,106 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block department %}
+	{% include 'main/includes/department_not_open.html'%}
+{% endblock %}
+
+{% block body %}
+		<!-- site__body -->
+		<div class="site__body">
+			<div class="page-header">
+				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title="" %}
+			</div>
+			<div class="block">
+				<div class="container">
+					<div class="row justify-content-center">
+						<div class="col-xl-5 col-lg-6 col-md-8">
+							<div class="card flex-grow-1 mb-0">
+								<div class="card-body">
+									<div class="card-title text-center">
+										<h1>Order Tracking</h1>
+									</div>
+									<p class="mb-4">
+										{% lorem 20 w random %}
+									</p>
+									<form method = 'post' action = '{% url 'track_order' %}'>
+										{% csrf_token %}
+										<div class="form-group">
+											<label for="track-order-id">Order ID</label>
+											<input id="track-order-id" name="order_id" type="text" class="form-control" placeholder="Order ID">
+										</div>
+										<div class="form-group">
+											<label for="track-email">Username</label>
+											<input id="track-email" name="username" type="text" class="form-control" placeholder="Username">
+										</div>
+										<div class="pt-3">
+											<button type="submit" class="btn btn-primary text-white btn-lg btn-block">Track Order</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						{% if order %}
+						<div class="col-xl-5 col-lg-6 col-md-8">
+							<div class="card flex-grow-1 mb-0">
+								<div class="card-body">
+									<div class="card-title text-center">
+										<h1>Order Result</h1>
+									</div>
+									<div class="row">
+										<div class="col-6">
+											<label for="track-order-id">Order ID: </label>
+											<p class="text-muted">{{order.id}}</p>
+										</div>
+										<div class="col-6">
+											<label for="track-email">Email: </label>
+											<p class="text-muted">{{order.user}}</p>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-6">
+											<label>Total Price: </label>
+											<p class="text-muted" style="font-family: 'Tajawal', sans-serif;">{{order.total_price}}</p>
+										</div>
+										<div class="col-6">
+											<label>Send Price: </label>
+											<p class="text-muted" style="font-family: 'Tajawal', sans-serif;">{{order.send_price}}</p>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-6">
+											<label>Tax: </label>
+											<p class="text-muted" style="font-family: 'Tajawal', sans-serif;">{{order.tax}}</p>
+										</div>
+										<div class="col-6">
+											<label>Can Package Sent: </label>
+											<p class="text-muted" style="font-family: 'Tajawal', sans-serif;">
+												{% if order.sent == 'F' %}
+													<span class="badge badge-warning rounded-pill px-3 py-2">Packege Wait for send</span>
+												{% elif order.sent == 'T' %}
+													<span class="badge badge-success rounded-pill px-3 py-2">Packege sent</span>
+												{% elif order.sent == 'B' %}
+												<span class="badge badge-danger rounded-pill px-3 py-2">Back to Store</span>
+												{% endif %}
+											</p>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-12">
+											<label>Follow Up Code: </label>
+											<p class="text-muted" style="font-family: 'Tajawal', sans-serif;">
+												{{order.FollowUpCode}}
+											</p>
+										</div>
+									</div>
+								</div>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- site__body / end -->
+
+{% endblock %}
+		

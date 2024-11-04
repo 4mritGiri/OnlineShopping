@@ -1,0 +1,27 @@
+<div class="col-12 col-lg-3 d-flex">
+   <div class="account-nav flex-grow-1">
+      <h4 class="account-nav__title">Navigation</h4>
+      <ul>
+         <li class="account-nav__item {% if request.path == '/dashboard/' %}account-nav__item--active{% endif %}">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+         </li>
+         <li class="account-nav__item {% if request.path == '/profile/' %}account-nav__item--active{% endif %}">
+            <a href="{% url 'profile' %}">Edit Profile</a>
+         </li>
+         <li class="account-nav__item {% if request.path == '/orders/' %}account-nav__item--active{% endif %}">
+            <a href="{% url 'orders' %}">Order History</a>
+         </li>
+         <li class="account-nav__item {% if request.path == '/address/' %}account-nav__item--active{% endif %}">
+            <a href="{% url 'addresses' %}">Addresses</a>
+         </li>
+         <li class="account-nav__item {% if request.path == '/password_change/' %}account-nav__item--active{% endif %}">
+            <a href="{% url 'change-password' %}">Change Password</a>
+         </li>
+         {% if user.is_authenticated %}
+            <li class="account-nav__item">
+               <a class="text-danger" href="{% url 'logout'%}">LogOut</a>
+            </li>
+         {% endif %}
+      </ul>
+   </div>
+</div>

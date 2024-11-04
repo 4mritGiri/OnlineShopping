@@ -1,0 +1,33 @@
+{% load l10n %}
+{% load humanize %}
+
+<div class="posts-list__item">
+   <div class="post-card post-card--layout--grid post-card--size--lg">
+      <div class="post-card__image">
+         <a href="{% url 'blog' %}">
+            <img src="{{ post.pic.url }}" class="img-responsive" height="{{post.imageheight}}" width="100%" style="object-fit: cover;" />
+         </a>
+      </div>
+      <div class="post-card__info text-capitalize">
+         <div class="post-card__author mr-2">
+            <a href="#">{{post.created_by.first_name}} {{post.created_by.last_name}}</a>
+         </div>
+         {% localize on %}
+            <div class="post-card__date">{{ post.published_date|naturaltime }}</div>
+         {% endlocalize %}
+         {% if post.comments.count > 0 %}
+            <div class="post-card__comments mr-2">
+               <a href="#">{{post.comments.count}} Comments</a>
+            </div>
+         {% endif %}
+
+         <div class="post-card__name">
+            <a href="{% url 'blog' %}">{{ post.title }}</a>
+         </div>
+         <div class="post-card__content">{{post.short_description}}</div>
+         <div class="post-card__read-more">
+            <a href="{% url 'PostDetailView' post.slug %}" class="btn btn-secondary btn-sm">Read More</a>
+         </div>
+      </div>
+   </div>
+</div>
