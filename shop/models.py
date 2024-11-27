@@ -39,7 +39,10 @@ class States(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
+        db_table = ''
         verbose_name_plural = 'States'
+        verbose_name = 'State'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -105,7 +108,9 @@ class User(AbstractUser):
         
         super(User, self).save(*args, **kwargs)
     class Meta:
-        verbose_name_plural = "Users"
+        db_table = 'user'
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
     def __str__(self):
         return self.email
@@ -124,8 +129,10 @@ class ProductCategory(models.Model):
     imageheight = models.PositiveIntegerField(editable=False, default=401)
 
     class Meta:
-        verbose_name_plural = "Product Categories"
-
+        db_table = 'product_categories'
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+    
     def __str__(self):
         return self.name
 
@@ -153,6 +160,8 @@ class Brand(models.Model):
         super(Brand, self).save(*args, **kwargs)
 
     class Meta:
+        db_table = 'brand'
+        verbose_name = "Brand"
         verbose_name_plural = "Brands"
 
     def __str__(self):
@@ -164,7 +173,9 @@ class ProductSize(models.Model):
     sizeno = models.CharField(max_length=20, help_text='Enter a product size')
 
     class Meta:
-        verbose_name_plural = 'Product Sizes'
+        db_table = 'product_size'
+        verbose_name = 'Size'
+        verbose_name_plural = 'Sizes'
 
     def __str__(self):
         return self.sizeno
@@ -176,7 +187,9 @@ class Color(models.Model):
     hex_code = models.CharField(max_length=7, help_text="Enter a hex code for the color")
 
     class Meta:
-        verbose_name_plural = "Product Colors"
+        db_table = 'product_colors'
+        verbose_name = 'Color'
+        verbose_name_plural = 'Colors'
 
     def __str__(self):
         return self.name
@@ -187,7 +200,9 @@ class Materials(models.Model):
     name = models.CharField(max_length=20, help_text="Enter a Product Material")
 
     class Meta:
-        verbose_name_plural = "Product Materials"
+        db_table = 'product_materials'
+        verbose_name = 'Material'
+        verbose_name_plural = 'Materials'
 
     def __str__(self):
         return self.name
@@ -240,7 +255,9 @@ class Product(models.Model):
     imageheight = models.PositiveIntegerField(editable=False, default=401)
 
     class Meta:
-        verbose_name_plural = "Products"
+        db_table = 'products'
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
 
     def save(self, *args, **kwargs):
         if not self.id:  # if this is a new item
@@ -261,7 +278,9 @@ class ProductInstance(models.Model):
     instock = models.IntegerField()
 
     class Meta:
-        verbose_name_plural = "Product Instances"
+        db_table = 'product_instances'
+        verbose_name = 'Product Instance'
+        verbose_name_plural = 'Product Instances'
 
     def __str__(self):
         return f"{self.id} : {self.seller}"
@@ -325,6 +344,8 @@ class Post(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='posts')
 
     class Meta:
+        db_table = 'posts'
+        verbose_name = 'Post'
         verbose_name_plural = "Posts"
         ordering = ['-published_date']
 
@@ -487,4 +508,7 @@ class CarouselBanner(models.Model):
         return self.title
 
     class Meta:
-        verbose_name_plural = "Carousel Banners"
+        db_table = 'carousel_banners'
+        verbose_name = 'Banner'
+        verbose_name_plural = 'Banners'
+        ordering = ['-id']

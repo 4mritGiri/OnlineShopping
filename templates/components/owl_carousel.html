@@ -1,4 +1,7 @@
-<a class="block-slideshow__slide" href="{% url 'CategoryListView' carousel.category.slug %}">
+<a 
+   class="block-slideshow__slide" 
+   href="{% if carousel.category.slug %}{% url 'CategoryListView' carousel.category.slug %}{% else %}#{% endif %}"
+>
    <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop" style="background-image: url('{{ carousel.image.url }}'); background-size: cover; background-position: center;"></div>
    <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile" style="background-image: url('{{ carousel.image.url }}'); background-size: cover; background-position: center;"></div>
    <div class="block-slideshow__slide-content" style="width: 40%;">

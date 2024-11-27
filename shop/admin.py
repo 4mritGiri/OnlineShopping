@@ -1,12 +1,9 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.utils.translation import ngettext
-
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.html import mark_safe
-
 from shop.models import Product, ProductCategory, Brand, ProductSize, States, Color, Materials, ProductInstance, WishList, Compare, Sold, Post, Coupon, Cart, ContactUs, User, CarouselBanner, Tag
-
 from unfold.admin import ModelAdmin, TabularInline
 from shop.forms import CarouselBannerForm
 
@@ -69,8 +66,8 @@ class UserAdmin(DefaultUserAdmin):
         '%d users were inactivated.',
         updated,
         ) % updated, messages.SUCCESS)
-
     make_inactive.short_description ='Make inactive'
+
 
     def profile_image(self, obj):
         if obj.avatar:
@@ -81,7 +78,6 @@ class UserAdmin(DefaultUserAdmin):
                 )
             )
         return "No Image"
-
 
 
 
@@ -111,6 +107,7 @@ class ProductCategoryAdmin(ModelAdmin):
         return "No Image"
 
 
+
 @admin.register(Brand)
 class BrandAdmin(ModelAdmin):
     list_display = ['name','logo_image']
@@ -128,11 +125,14 @@ class BrandAdmin(ModelAdmin):
                 )
             )
         return "No Image"
+
     
 
 @admin.register(ProductSize)
 class ProductSizeAdmin(ModelAdmin):
     list_display = ['sizeno',]
+
+
 
 @admin.register(States)
 class StatesAdmin(ModelAdmin):
@@ -140,11 +140,14 @@ class StatesAdmin(ModelAdmin):
     search_fields = ['name',]
     order_by =['A']
 
+
+
 @admin.register(Color) 
 class ColorAdmin(ModelAdmin):
     list_display = ['name',]
     search_fields = ['name']
     order_by =['A']
+
 
 
 @admin.register(Materials)
@@ -154,13 +157,13 @@ class MaterialsAdmin(ModelAdmin):
     order_by =['A']
 
 
+
 class ProductInstanceInline(TabularInline):
     model = ProductInstance
-
-    # this methode show no extra empty fields from Inline fields
     def get_extra(self, request , obj=None , **kwargs):
         extra = 0
         return extra
+
 
 
 @admin.register(Product)
@@ -187,6 +190,7 @@ class ProductAdmin(ModelAdmin):
     inlines=[ProductInstanceInline]
 
 
+
 @admin.register(ProductInstance)
 class ProductInstanceAdmin(ModelAdmin):
     list_display = ['product', 'seller', 'price', 'off', 'instock']
@@ -197,11 +201,13 @@ class ProductInstanceAdmin(ModelAdmin):
     list_editable = ['off', 'instock']
 
 
+
 @admin.register(WishList)
 class WishListAdmin(ModelAdmin):
     list_display = ['product', 'user', 'created_at']
     fields = ['product', 'user', 'created_at']
     readonly_fields = ['created_at']
+
 
 
 @admin.register(Compare)
@@ -211,16 +217,21 @@ class CompareAdmin(ModelAdmin):
     readonly_fields = ['created_at']
 
 
+
 @admin.register(Sold)
 class SoldAdmin(ModelAdmin):
     list_diaplay = ["user",'products','total','date','sent',]
     search_fields   = ['products','user']
     list_filter = ["user",'total','date','sent',]
 
+
+
 @admin.register(Tag)
 class TagAdmin(ModelAdmin):
     list_display = ['name',]
     search_fields = ['name',]
+
+
 
 @admin.register(Post)
 class PostAdmin(ModelAdmin):
@@ -242,6 +253,7 @@ class PostAdmin(ModelAdmin):
         return "No Image"
 
 
+
 @admin.register(Coupon)
 class CouponAdmin(ModelAdmin):
     list_display = ['code','off','count','expire',]
@@ -249,11 +261,13 @@ class CouponAdmin(ModelAdmin):
     search_fields = ['code',]
 
 
+
 @admin.register(Cart)
 class CartAdmin(ModelAdmin):
     list_display = ['user','product','count','seller','coupon','payed',]
     list_filter = ['product','seller','payed',]
     search_fields = ['user','seller','product',]
+
 
 
 @admin.register(ContactUs)

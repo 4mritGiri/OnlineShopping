@@ -1,8 +1,13 @@
 from django.conf import settings
-
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
+
+
+admin.site.site_header = 'E-commerce Admin'
+admin.site.site_title = 'E-commerce Admin Portal'
+admin.site.index_title = 'Welcome to E-commerce Admin Portal'
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

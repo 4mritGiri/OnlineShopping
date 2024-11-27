@@ -794,13 +794,15 @@ def is_authenticated(user):
 @login_required(login_url="login")
 def cart_(request):
     objs = Cart.objects.filter(user=request.user, payed='F')
-    tPrice = sum(obj.total() for obj in objs)
-    final = sum(obj.total_price() for obj in objs)
-    CFinal = sum(obj.final_price() for obj in objs)
-
-    tax = final - tPrice
-    coupon = CFinal - final
+    tPrice = sum(obj.total() for obj in objs)  # Total price without discounts or tax
+    final = sum(obj.total_price() for obj in objs)  # Price after discounts but before taxes and shipping
+    CFinal = sum(obj.final_price() for obj in objs)  # Price after all discounts, coupons, and taxes
+    
+    TAX_RATE = 0.10  # Example: 10% tax
+    tax = round(tPrice * TAX_RATE, 2)
+    coupon = final - CFinal
     sendCost = SHIPPING_COST * len(objs)
+    
     toPay = CFinal + tax + sendCost
 
     if objs:
@@ -812,11 +814,10 @@ def cart_(request):
                     product_obj = Product.objects.get(slug=slug)
                     for obj in objs:
                         if obj.product == product_obj:
-                            obj.count = int(count)
+                            obj.count = int(count)  # Update the count
                             obj.save()
                             break
                 except Product.DoesNotExist:
-                    # Handle error (e.g., return an error message)
                     logger.error(f"Product with slug {slug} does not exist")
                     pass
 
@@ -826,14 +827,13 @@ def cart_(request):
                     product_obj = Product.objects.get(slug=slug)
                     for obj in objs:
                         if obj.product == product_obj:
-                            obj.delete()
+                            obj.delete()  # Delete the cart item
                             break
                 except Product.DoesNotExist:
-                    # Handle error (e.g., return an error message)
                     logger.error(f"Product with slug {slug} does not exist")
                     pass
                 messages.success(request, "Product removed from cart")
-                return redirect(request.META['HTTP_REFERER'])
+                return redirect(request.META.get('HTTP_REFERER', 'cart'))
 
             elif 'applyCoupon' in request.POST:
                 code = request.POST.get('couponCode')
@@ -847,13 +847,12 @@ def cart_(request):
                     else:
                         for obj in objs:
                             obj.coupon = co
-                            obj.save()
+                            obj.save()  # Apply the coupon to each cart item
                         messages.success(request, "Coupon applied successfully")
                         return HttpResponseRedirect(reverse('cart'))
                 except Coupon.DoesNotExist:
                     error = 'The coupon code is incorrect!'
 
-                # If there's an error, prepare context
                 context = {
                     'title': 'Shopping Cart',
                     'carts': objs,
@@ -867,9 +866,8 @@ def cart_(request):
                 }
                 return render(request, 'cart.html', context)
 
-        # Render cart context
         context = {
-            'title': f'Cart({objs.count()})',
+            'title': f'Cart ({objs.count()})',
             'carts': objs,
             'is_authenticated': True,
             'totalPrice': tPrice,
@@ -886,7 +884,6 @@ def cart_(request):
         }
         return render(request, 'cart.html', context)
     
-    # Empty cart response
     context = {
         'title': 'Empty Cart',
         'breadcrumb': [
@@ -896,6 +893,7 @@ def cart_(request):
         ]
     }
     return render(request, 'cart-empty.html', context)
+
 
 
 
@@ -915,10 +913,10 @@ def contact_us(request):
     return render(request, 'contact-us.html', context)
 
 
-
 @login_required(login_url="login")
 def checkout(request):
     User = get_user_model()
+    
     try:
         usr = User.objects.get(username=request.user.username)
     except User.DoesNotExist:
@@ -927,12 +925,12 @@ def checkout(request):
 
     carts = Cart.objects.filter(user=request.user, payed='F')
 
-    # Calculate prices
-    tPrice = sum(i.total() for i in carts)
-    final = sum(i.total_price() for i in carts)
-    CFinal = sum(i.final_price() for i in carts)
-    
-    tax = final - tPrice  
+    tPrice = sum(i.total() for i in carts)  # Total price without discounts or taxes
+    final = sum(i.total_price() for i in carts)  # Price after discounts but before tax and shipping
+    CFinal = sum(i.final_price() for i in carts)  # Price after all discounts (final price)
+
+    TAX_RATE = 0.10  # Example: 10% tax rate
+    tax = round(tPrice * TAX_RATE, 2)
     coupon = CFinal - final  
     sendCost = SHIPPING_COST * len(carts)
     toPay = CFinal + tax + sendCost
@@ -940,42 +938,54 @@ def checkout(request):
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            # Process the form data
             company = form.cleaned_data['company']
             address = form.cleaned_data['address']
             city = form.cleaned_data['city']
             postcode = form.cleaned_data['postcode']
-            state = form.cleaned_data['state'] 
-            description = form.cleaned_data['desc']  
-            sell = Sold.objects.create(
-                user=request.user, company=company,
-                address=address, zip_code=postcode,
-                state=States.objects.get(id=state),
-                city=city, total_price=CFinal, send_price=sendCost, tax=tax,
-                total=toPay, desc=description
-            )
-                
-            for c in carts:
-                sell.products.add(c)
-                instance = c.seller
-                instance.instock -= 1
-                instance.save()
-                c.payed = 'T'
-                c.save()
+            state = form.cleaned_data['state']
+            description = form.cleaned_data['desc']
 
-            sell.save()
-            messages.success(request, "Order placed successfully")
-            return redirect('cart')
+            try:
+                sell = Sold.objects.create(
+                    user=request.user, company=company,
+                    address=address, zip_code=postcode,
+                    state=States.objects.get(id=state),
+                    city=city, total_price=CFinal, send_price=sendCost, tax=tax,
+                    total=toPay, desc=description
+                )
+                
+                for c in carts:
+                    sell.products.add(c)
+                    instance = c.seller
+                    instance.instock -= 1
+                    instance.save()
+                    c.payed = 'T'
+                    c.save()
+
+                sell.save()
+                messages.success(request, "Order placed successfully!")
+                return redirect('cart')
+
+            except Exception as e:
+                logger.error(f"Error during checkout: {e}")
+                messages.error(request, "An error occurred while processing your order.")
+                return redirect(request.META.get('HTTP_REFERER', 'cart'))
+
         else:
             logger.error(f"Form is not valid: {form.errors}")
-            messages.error(request, "Form is not valid")
+            messages.error(request, "Form is not valid. Please correct the errors.")
             return redirect(request.META['HTTP_REFERER'])
-        
+
     else:
-        form = CheckoutForm(initial={'address': usr.address, 'city': usr.city, 'state': usr.state, 'postcode': usr.postcode})
+        form = CheckoutForm(initial={
+            'address': usr.address,
+            'city': usr.city,
+            'state': usr.state,
+            'postcode': usr.postcode
+        })
     
     context = {
-        'title': f'Checkout({usr.username})',
+        'title': f'Checkout ({usr.username})',
         'form': form,
         'state': States.objects.all(),
         'not_authenticated': False,
@@ -995,6 +1005,7 @@ def checkout(request):
         ]
     }
     return render(request, 'checkout.html', context)
+
 
 
 
@@ -1364,53 +1375,3 @@ def wishlist(request):
         ]
     }
     return render(request, 'wishlist.html', context)
-
-
-
-
-
-
-"""from django.core.paginator import Paginator
-from django.core.paginator import EmptyPage
-from django.core.paginator import PageNotAnInteger
-
-def search_post(request , search=None):
-    if request.method =='POST':
-        user_search = request.POST.get('search')
-        
-        if user_search:
-            post_results1 = Post.objects.filter(body__icontains= user_search)
-            post_results2 = Post.objects.filter(title__icontains= user_search)
-            posts = post_results1 | post_results2
-
-            if search:
-                posts.filter(slug__in= search)
-            
-            paginator = Paginator(posts , 6)
-            page = request.GET.get('page')
-
-            try:
-                posts = paginator.page(page)
-            except PageNotAnInteger:
-                posts = paginator.page(1)
-            except EmptyPage:
-                posts = paginator.page(paginator.num_pages)
-            
-            return render(request , 'blog-classic.html' , {'posts':posts , 'page':page })
-    
-    post_results = Post.objects.all()
-    posts = post_results
-    if search:
-        posts.filter(slug__in= search)
-        
-    paginator = Paginator(posts , 6)
-    page = request.GET.get('page')
-
-    try:
-        posts = paginator.page(page)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
-    return render(request , 'blog-classic.html' , {'posts':posts , 'page':page })
-"""
