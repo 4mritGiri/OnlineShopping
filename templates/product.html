@@ -179,7 +179,7 @@
 											<div class="input-radio-color__list">
 												{% for i in product.color.all %}
 												<label class="input-radio-color__item input-radio-color__item--white" style="color: {{ i.hex_code }}" data-toggle="tooltip" title="{{ i.name }}">
-													<input type="radio" name="Color" value="{{ i.id }}"> <span></span></label>
+													<input type="radio" name="Color" value="{{ i.id }}" required> <span></span></label>
 												
 												{% endfor %}
 											</div>
@@ -191,7 +191,7 @@
 											<div class="input-radio-label__list">
 												{% for k in product.material.all %}
 												<label>
-													<input type="radio" name="Material" value="{{ k.id }}"> <span>{{ k.name }}</span>
+													<input type="radio" name="Material" value="{{ k.id }}" required> <span>{{ k.name }}</span>
 												</label>
 												{% endfor %}
 											</div>
@@ -203,7 +203,7 @@
 											<div class="input-radio-label__list">
 												{% for k in product.size.all %}
 												<label>
-													<input type="radio" name="Size" value="{{ k.id }}"> <span>{{ k.sizeno }}</span>
+													<input type="radio" name="Size" value="{{ k.id }}" required> <span>{{ k.sizeno }}</span>
 												</label>
 												
 												{% endfor %}
@@ -214,7 +214,9 @@
 										<label class="control-label">Select Seller</label>
 										<select class="form-control" id="input-option200" name="seller">
 									  {% for i in inst %}
-										<option value ={{ i.id }}><li>Name :{{ i.seller }} &nbsp;  Original Price :{{ i.price }} &nbsp;   Discount :  {{ i.off }}</li></option>
+										<option value ={{ i.id }}>
+											<li>Name :{{ i.seller }} &nbsp;  Original Price :{{ i.price }} &nbsp;   Discount :  {{ i.off }}</li>
+										</option>
 									  {% endfor %}
 									</select>
 									</div><br/>
