@@ -140,7 +140,11 @@
 											</div>
 										</div>
 									</div>
-									<div class="product__rating-legend"><a href="#">7 Reviews</a><span>/</span><a href="#">Write a Review</a></div>
+									<div class="product__rating-legend">
+										<a href="#">7 Reviews</a>
+										<span>/</span>
+										<a href="#">Write a Review</a>
+									</div>
 								</div>
 								<div class="product__description">{{ product.mini_description }}</div>
 								<ul class="product__features">
@@ -265,7 +269,11 @@
 							<!-- .product__end -->
 							<div class="product__footer">
 								<div class="product__tags tags">
-									<div class="tags__list"><a href="#">Base</a> <a href="#">Electrode</a> <a href="#">Electric Drill</a></div>
+									<div class="tags__list">
+										{% for tag in product.tags.all %}
+										<a href="#" class="tags__item" title="{{ tag.name }}">{{ tag.name }}</a>
+										{% endfor %}
+									</div>
 								</div>
 								<div class="product__share-links share-links">
 									<ul class="share-links__list">
@@ -293,46 +301,64 @@
 										<h4 class="spec__section-title">General</h4>
 										<div class="spec__row">
 											<div class="spec__name">Material</div>
-											<div class="spec__value">Aluminum, Plastic</div>
+											<div class="spec__value">
+												{% if product.material %}
+													{% for material in product.material.all %}
+														{{ material }}, 
+													{% endfor %}
+												{% else %}
+												Not specified
+												{% endif %}
+											</div>
 										</div>
 										<div class="spec__row">
-											<div class="spec__name">Type of Motor</div>
-											<div class="spec__value">Without Brush</div>
+											<div class="spec__name">Type of Colors</div>
+											<div class="spec__value">
+												{% if product.color %}
+													{% for color in product.color.all %}
+														<span style="background-color: {{ color.hex_code }}; padding: 2px 6px; border-radius: 4px; color: {% if color.hex_code == 'white' or color.hex_code == '#fff' or color.hex_code == '#ffffff' %}#000 {% else %}#fff{% endif %};box-shadow: 0px 0px 1px 1px;">{{ color.name }}</span>
+													{% endfor %}
+												{% else %}
+													Not specified
+												{% endif %}
+											</div>
 										</div>
 										<div class="spec__row">
-											<div class="spec__name">Battery Voltage</div>
-											<div class="spec__value">18 Volt</div>
+											<div class="spec__name">Brand</div>
+											<div class="spec__value">
+												{% if product.brand %}
+												{{ product.brand }}
+												{% else %}
+												Not specified
+												{% endif %}
+											</div>
 										</div>
 										<div class="spec__row">
-											<div class="spec__name">Battery Type</div>
-											<div class="spec__value">Lithium Ion</div>
-										</div>
-										<div class="spec__row">
-											<div class="spec__name">Number of Speeds</div>
-											<div class="spec__value">2</div>
-										</div>
-										<div class="spec__row">
-											<div class="spec__name">Battery Charge Time</div>
-											<div class="spec__value">2 Hours</div>
-										</div>
-										<div class="spec__row">
-											<div class="spec__name">Weight</div>
-											<div class="spec__value">1.5 Kilograms</div>
+											<div class="spec__name">Category</div>
+											<div class="spec__value">
+												{% if product.category %}
+												{{ product.category }}
+												{% else %}
+												Not specified
+												{% endif %}
+											</div>
 										</div>
 									</div>
 									<div class="spec__section">
 										<h4 class="spec__section-title">Dimensions</h4>
 										<div class="spec__row">
-											<div class="spec__name">Length</div>
-											<div class="spec__value">99 mm</div>
-										</div>
-										<div class="spec__row">
-											<div class="spec__name">Width</div>
-											<div class="spec__value">207 mm</div>
-										</div>
-										<div class="spec__row">
-											<div class="spec__name">Height</div>
-											<div class="spec__value">208 mm</div>
+											<div class="spec__name">Size</div>
+											<div class="spec__value">
+												{% if product.size %}
+												<div class="tags__list">
+													{% for size in product.size.all %}
+														<a href="#" title="{{ size }}">{{ size }}</a>
+													{% endfor %}
+													</div>
+												{% else %}
+												Not specified
+												{% endif %}
+											</div>
 										</div>
 									</div>
 									<div class="spec__disclaimer">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien. Sed ut purus eget sapien. Sed ut purus eget sapien.</div>

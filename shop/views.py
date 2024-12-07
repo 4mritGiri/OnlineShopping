@@ -327,9 +327,10 @@ def ProductDetailView(request, productslug):
                 elif 'addCart' in request.POST:
                     try:
                         color_id = request.POST.get('Color')
-                        seller_id = request.POST.get('Seller')
+                        seller_id = request.POST.get('seller')
                         size_id = request.POST.get('Size')
                         material_id  = request.POST.get('Material')
+                        print(color_id, seller_id, size_id, material_id)
                         UsersProducts = Cart.objects.filter(user=request.user, payed='F')
                         Found = False
                         for i in UsersProducts:
@@ -1007,6 +1008,63 @@ def checkout(request):
     return render(request, 'checkout.html', context)
 
 
+
+@login_required
+def update_cart(request):
+    if request.method == "POST":
+        if 'update' in request.POST:
+            cart_item_slug = request.POST.get('product_slug')
+            quantity = int(request.POST.get('quantity'))
+            cart_item = Cart.objects.get(user=request.user, product__slug=cart_item_slug)
+            cart_item.count = quantity
+            cart_item.save()
+
+        # Apply coupon code
+        if 'applyCoupon' in request.POST:
+            coupon_code = request.POST.get('couponCode')
+            try:
+                coupon = Coupon.objects.get(code=coupon_code)
+                request.session['coupon'] = coupon.id
+            except Coupon.DoesNotExist:
+                request.session['coupon'] = None
+
+        # Fetch the cart items
+        carts = Cart.objects.filter(user=request.user)
+        
+        # Recalculate totals
+        total_price = 0
+        send_cost = 0  # Assuming a flat shipping cost for simplicity
+        tax = 0  # Assuming no tax for simplicity
+        coupon_discount = 0
+        
+        # Get coupon discount if exists
+        coupon = None
+        if 'coupon' in request.session:
+            coupon = Coupon.objects.get(id=request.session['coupon'])
+            coupon_discount = coupon.discount
+
+        # Calculate total price
+        for item in carts:
+            item_price = item.seller.price * item.count
+            total_price += item_price
+
+        # Apply coupon discount if available
+        total_price = total_price * (1 - coupon_discount / 100)
+
+        # Final total
+        to_pay = total_price + send_cost + tax
+
+        return render(request, 'cart/cart.html', {
+            'carts': carts,
+            'totalPrice': total_price,
+            'sendCost': send_cost,
+            'tax': tax,
+            'coupon': coupon_discount,
+            'toPay': to_pay,
+        })
+
+    # If GET request, just render the page without any changes
+    return redirect('cart')
 
 
 class PostListView(ListView):

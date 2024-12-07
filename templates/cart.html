@@ -11,7 +11,7 @@
 				{% include 'components/breadcrumb.html' with breadcrumb=breadcrumb title=title %}
 			</div>
 			<div class="cart block">
-				<form method = "post">
+				<form method="post">
 				{% csrf_token %}
 				<div class="container">
 					<table class="cart__table cart-table">
@@ -76,9 +76,7 @@
 						</tbody>
 					</table>
 					<table class="table-responsive">
-						
 						<tbody>
-							
 							<div class="cart__actions">
 								<th>
 									<form class="cart__coupon-form" method="post">
@@ -87,15 +85,17 @@
 										<input type="text" class="form-control" id="input-coupon" placeholder="Coupon Code" name="couponCode">
 									</form>
 								</th>
-								<th>
+								<th colspan="4">
 									<button type="submit" name='applyCoupon' class="btn btn-primary" id="button-coupon">Apply Coupon</button>	
 								</th>
-								<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+								<th></th>
 								<th>
 									{% if not user.is_authenticated %}
-									<div class="cart__buttons"><a href="{% url 'track-order' %}" class="btn btn-light">Continue Shopping</a></div>
+									<div class="cart__buttons">
+										<a href="{% url 'track-order' %}" class="btn btn-light">Continue Shopping</a>
+									</div>
 									{% endif %}
-									<a  href="" class="btn btn-primary cart__update-button" type="submit" name="update" >Update Cart</a></i>
+									<button type="submit" name="update" class="btn btn-primary cart__update-button">Update Cart</button>
 								</th>
 							</div>
 						</tbody>
@@ -145,4 +145,3 @@
 		</div>
 		<!-- site__body / end -->
 {% endblock %}
-		

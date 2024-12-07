@@ -180,7 +180,7 @@ class ProductAdmin(ModelAdmin):
             'fields':('name','slug','brand','category',)
         }),
         ('Product Info',{
-            'fields':('color','material','size','mini_description',)
+            'fields':('color','material','size','mini_description','tags')
         }),
         ('pictures',{
             'fields':('pic0','pic1','pic2','pic3','pic4',)

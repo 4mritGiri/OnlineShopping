@@ -57,6 +57,7 @@ urlpatterns =[
     path('cart/', cart_, name='cart'),
     path('orders/', account_orders, name='orders'),
     path('checkout/', checkout, name='checkout'),
+    path('update/cart/', update_cart, name='update_cart'),
     path('track_order/', track_order, name='track_order'),
     #path('cart/cart-empty/',cart_empty, name="cart-empty" ),
 

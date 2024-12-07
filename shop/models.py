@@ -253,6 +253,7 @@ class Product(models.Model):
     description = models.TextField(null=True, blank=True)
     imagewidth = models.PositiveIntegerField(editable=False, default=401)
     imageheight = models.PositiveIntegerField(editable=False, default=401)
+    tags = models.ManyToManyField('Tag', related_name='products', blank=True)
 
     class Meta:
         db_table = 'products'
