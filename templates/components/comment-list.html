@@ -24,13 +24,21 @@
             </div>
             <div class="comment__content">
                <div class="comment__header">
-                  <div class="comment__author"><a href="#">{{comment.writer.first_name}} {{comment.writer.last_name}}</a></div>
+                  <div class="comment__author">
+                     <a href="#">
+                        {% if comment.writer.first_name %}
+                           {{comment.writer.first_name}} {{comment.writer.last_name}}
+                        {% else %}
+                           {{ comment.writer.username|title }}
+                        {% endif %}
+                     </a>
+                  </div>
                   <div class="comment__reply">
                      <button type="button" class="btn btn-xs btn-light">Reply</button>
                   </div>
                </div>
                <div class="comment__text">{{comment.body}}</div>
-               <div class="comment__date">{{comment.created_date|naturaltime}}</div>
+               <div class="comment__date">{{comment.created_at|naturaltime}}</div>
             </div>
          </div>
       </li>

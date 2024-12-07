@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.utils.translation import ngettext
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.html import mark_safe
-from shop.models import Product, ProductCategory, Brand, ProductSize, States, Color, Materials, ProductInstance, WishList, Compare, Sold, Post, Coupon, Cart, ContactUs, User, CarouselBanner, Tag
+from shop.models import Product, ProductCategory, Brand, ProductSize, States, Color, Materials, ProductInstance, WishList, Compare, Sold, Post, Coupon, Cart, ContactUs, User, CarouselBanner, Tag, Comments, Review
 from unfold.admin import ModelAdmin, TabularInline
 from shop.forms import CarouselBannerForm
 
@@ -131,6 +131,16 @@ class BrandAdmin(ModelAdmin):
 @admin.register(ProductSize)
 class ProductSizeAdmin(ModelAdmin):
     list_display = ['sizeno',]
+
+
+@admin.register(Comments)
+class CommentsAdmin(ModelAdmin):
+    list_display = ['writer', 'body', 'created_at']
+
+
+@admin.register(Review)
+class ReviewAdmin(ModelAdmin):
+    list_display = ['writer', 'rating', 'body', 'is_active', 'created_at']
 
 
 

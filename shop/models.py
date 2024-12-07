@@ -367,6 +367,21 @@ class Post(models.Model):
         return self.title
 
 
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    writer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    body = models.TextField()
+    rating = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'review'
+        verbose_name = 'Review'
+        verbose_name_plural = 'Reviews'
+
 
 class Comments(models.Model):
     class StatusChoice(models.TextChoices):
@@ -375,14 +390,14 @@ class Comments(models.Model):
 
     writer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     body = models.CharField(max_length=500)
-    date = models.DateField(auto_now_add=True)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True, blank=True, related_name='comments')
     status = models.CharField(max_length=1, choices=StatusChoice.choices, default=StatusChoice.WAITING)
+    created_at = models.DateField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Comments"
-        ordering = ['-date']
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.writer} : {self.body}"

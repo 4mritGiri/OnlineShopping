@@ -38,6 +38,9 @@ urlpatterns =[
     
     # Product urls
     path('product/<slug:productslug>/', ProductDetailView, name='ProductDetailView'),
+
+    # path('review/<slug:productslug>/', ProductDetailView, name='ReviewProduct'),
+
     path('search/', SearchProduct.as_view(), name ='search_product'),
     
     path('category/<slug:catslug>/', CategoryListView.as_view(), name='CategoryListView'),

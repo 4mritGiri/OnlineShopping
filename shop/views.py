@@ -273,18 +273,18 @@ class ProductListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(ProductListView, self).get_context_data(**kwargs)
         mostSold = Cart.objects.annotate(num_products=Count('seller')).order_by('-num_products')
-        for i in mostSold:
-            i.product.rating = random.randint(1, 5)
-            i.product.reviews = random.randint(5, 100)
+        # for i in mostSold:
+        #     i.product.rating = random.randint(1, 5)
+        #     i.product.reviews = random.randint(5, 100)
             
         instock = ProductInstance.objects.filter(~Q(instock=0)).values() 
 
         # Show the top 9 categories most products
         topCategories = ProductCategory.objects.annotate(num_products=Count('products')).order_by('-num_products')[:9]
         products = Product.objects.all()
-        for product in products:
-            product.rating = random.randint(1, 5)
-            product.reviews = random.randint(5, 100)
+        # for product in products:
+        #     product.rating = random.randint(1, 5)
+        #     product.reviews = random.randint(5, 100)
         
         context.update({
             'products': products,
@@ -303,6 +303,9 @@ def ProductDetailView(request, productslug):
     k = get_object_or_404(Product, slug=productslug)
     aProduct = Product.objects.filter(category=k.category)
     comments = Comments.objects.filter(product__id=k.id)
+    # for product in aProduct:
+    #     product.rating = random.randint(1, 5)
+    #     product.reviews = random.randint(5, 100)
 
     inst = []
     i = ProductInstance.objects.filter(product=k)
@@ -394,8 +397,33 @@ def ProductDetailView(request, productslug):
                     else:
                         messages.warning(request, "Product not found")
                         return redirect(request.META['HTTP_REFERER'])
+                
+                elif 'addReview' in request.POST:
+                    print(" Reviewing product")
+                    product_id = request.POST['product_id']
+                    rating = request.POST['review-stars']
+                    # author_name = request.POST['review-author']
+                    # author_email = request.POST['review-email']
+                    review = request.POST['review-text']
+                    
+                    print(product_id, rating, review)
+
+                    product_check = Product.objects.get(id=product_id)
+                    if product_check:
+                        review_obj = Review.objects.create(
+                            user=request.user, 
+                            rating=rating,
+                            product_id=product_id, 
+                            body=review, 
+                        )
+                        review_obj.save()
+                        messages.success(request, "Review added successfully")
+                        return redirect(request.META['HTTP_REFERER'])
+                    else:
+                        messages.warning(request, "Product not found")
+                        return redirect(request.META['HTTP_REFERER'])
         else:
-            messages.warning(request, "Please login to add to cart, wishlist or compare")
+            messages.warning(request, "Please login to add to cart, wishlist, compare, or Review")
             return redirect('login')
 
     if inst:
