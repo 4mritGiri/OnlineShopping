@@ -393,7 +393,7 @@ class Comments(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True, blank=True, related_name='comments')
     status = models.CharField(max_length=1, choices=StatusChoice.choices, default=StatusChoice.WAITING)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Comments"

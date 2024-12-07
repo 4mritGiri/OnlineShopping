@@ -406,8 +406,6 @@ def ProductDetailView(request, productslug):
                     # author_email = request.POST['review-email']
                     review = request.POST['review-text']
                     
-                    print(product_id, rating, review)
-
                     product_check = Product.objects.get(id=product_id)
                     if product_check:
                         review_obj = Review.objects.create(
@@ -1154,7 +1152,7 @@ class PostDetailView(LatestPostsMixin,DetailView):
     def get_context_data(self, **kwargs):
         context = super(PostDetailView, self).get_context_data(**kwargs)
         
-        comments = self.object.comments.filter(status=Comments.StatusChoice.OK).order_by('date')
+        comments = self.object.comments.filter(status=Comments.StatusChoice.OK).order_by('created_at')
         
         context.update({
             'title': self.object.title,
