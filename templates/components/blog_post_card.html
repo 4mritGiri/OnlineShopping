@@ -10,7 +10,13 @@
       </div>
       <div class="post-card__info text-capitalize">
          <div class="post-card__author mr-2">
-            <a href="#">{{post.created_by.first_name}} {{post.created_by.last_name}}</a>
+            <a href="#">
+               {% if post.created_by.first_name %}
+                  {{ post.created_by.first_name }} {{ post.created_by.last_name }}
+               {% else %}
+                  {{ post.created_by }}
+               {% endif %}
+            </a>
          </div>
          {% localize on %}
             <div class="post-card__date">{{ post.published_date|naturaltime }}</div>

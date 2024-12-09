@@ -93,7 +93,9 @@
 							{% if comments.count > 0 %}
 								{% include 'components/comment-list.html' with comments=comments %}
 							{% endif %}
-							{% include 'components/comment-write.html' %}
+							{% if request.user.is_authenticated %}
+								{% include 'components/comment-write.html' %}
+							{% endif %}
 						</div>
 					</div>
 					{% include "components/blog-right-side.html" with posts=latest_posts_list|slice:":4" tags=tags %}

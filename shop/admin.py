@@ -230,9 +230,16 @@ class CompareAdmin(ModelAdmin):
 
 @admin.register(Sold)
 class SoldAdmin(ModelAdmin):
-    list_diaplay = ["user",'products','total','date','sent',]
+    list_display = ["user", 'products_summary', 'total', 'date', 'sent',]
     search_fields   = ['products','user']
     list_filter = ["user",'total','date','sent',]
+    
+    list_editable = ['sent',]
+    
+    def products_summary(self, obj):
+        return ", ".join([str(product) for product in obj.products.all()])
+    products_summary.short_description = 'Products'
+
 
 
 

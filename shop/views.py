@@ -65,7 +65,7 @@ def register(request):
         
         # send email when account has been created successfully
         subject = "Welcome to online shopping"
-        message = "Welcome "+ my_user.email + "\n thank for chosing out online shopping.\n To order login you need to comfirm your email account.\n thanks\n\n\n Nishita"
+        message = "Welcome "+ my_user.email + "\n thank for chosing out online shopping.\n To order login you need to comfirm your email account.\n thanks\n\n\n Amrit"
         
         from_email = settings.EMAIL_HOST_USER
         to_list = [my_user.email]

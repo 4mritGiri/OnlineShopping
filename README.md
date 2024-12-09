@@ -39,7 +39,7 @@ Enjoy it. :)
 ## Installation
 1. Follow the steps below to install app perfectly:
 ```shell
- > git clone https://github.com/nishitatilokani/OnlineShopping
+ > git clone https://github.com/4mritGiri/OnlineShopping
 
  > virtualenv venv 
 
