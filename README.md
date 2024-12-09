@@ -10,9 +10,8 @@
 
 
 ## Introduction
-This is my first real project with `django` and i had many challenges to make this. django is very simple and nice framework i have ever seen.
-beause its powered and developed with `python` and i love python too.
-Actually, i just developed a backend side of this website and frontend side of it is pre-created and i just downloaded.
+Django is very simple and nice framework i have ever seen.
+beause its powered and developed with `python` and i love python too. Actually, i just developed a backend side of this website and frontend side of it is pre-created and i just downloaded.
 everything that a Ecommerce website needed is available in the following website and can used by everyone who wants to start or have small shopping.
 Enjoy it. :)
 
@@ -45,7 +44,7 @@ Enjoy it. :)
 
  > venv\scripts\activate 
 
-(venv) > cd project_folder 
+(venv) > cd <project_folder> 
 
 (venv) > pip install -r requirements.txt
 
@@ -53,13 +52,30 @@ Enjoy it. :)
 
 ```
 
+
+  - Follow the steps below to install in linux:
+  ```shell
+  > git clone https://github.com/4mritGiri/OnlineShopping 
+
+  > python3 -m venv venv
+
+  > source venv/bin/activate
+
+  (venv) > cd <project_folder>
+  
+  (venv) > pip install -r requirements.txt
+
+  (venv) > python manage.py runserver
+
+  ```
+
+
 Now you can open a browser like chrome or etc and just go to url as <a href='http://localhost:8000/'>http://localhost:8000/
 
 ## Admin
-If you want to login to admin page look below:
-```login
-username/email : admin
-password : admin123456
+  - Crate a superuser by running the following command in your terminal:
+```shell
+(venv) > python manage.py createsuperuser
 ```
 ## Resources
 
